@@ -1,20 +1,16 @@
 package museum;
 
+import static java.lang.Integer.parseInt;
 import java.sql.*;
 import java.util.ArrayList;
 public class Database {
     private static Database instance;
     private Connection con;
     private Statement stmt;
-    public ArrayList<String> ticketTypes1 = new ArrayList<String>();
-    public ArrayList<String> ticketTypes2 = new ArrayList<String>();
-    public ArrayList<String> ticketTypes3 = new ArrayList<String>();
-    public ArrayList<String> name  = new ArrayList<String>();
-    public ArrayList<String> description = new ArrayList<String>();
-    public ArrayList<String> regionOfOrigin = new ArrayList<String>();
-    public ArrayList<String> yearOfProduction = new ArrayList<String>();
-    public ArrayList<String> roomPlacement = new ArrayList<String>();
-    
+    private Ticket ticket;
+    private Item item;
+    public ArrayList<Ticket> ticketStoring = new ArrayList<Ticket>();
+    public ArrayList<Item> itemStoring = new ArrayList<Item>();
     
     public Database(){
         try{
@@ -41,7 +37,7 @@ public class Database {
     }
     
   public void insertData() {
-    String query = "INSERT INTO `ticket type` (`Ticket type`, `Description`, `Price`) VALUES ('Platinum', 'I go poop.', 5)";
+    String query = "INSERT INTO `exhibition items` (`Name`, `Description`, `Region of origin`, `Year of production`, `Room placement`) VALUES ('Platinum', 'I go poop.','Platinum', 5,6)";
     try {
         stmt.executeUpdate(query);
         System.out.println("Data inserted successfully");
@@ -50,46 +46,53 @@ public class Database {
     }
 }
   
+     
+  public void insertData2() {
+    String query = "INSERT INTO `ticket type` (`Ticket type`, `Description`, `Price`) VALUES ('Platinum', 'I go poop.',6)";
+    try {
+        stmt.executeUpdate(query);
+        System.out.println("Data inserted successfully");
+    } catch (SQLException e) {
+        System.out.println(e.getMessage() + " - Error inserting data");
+    }
+}
+  
+  public void deleteData(int id) {
+    String query = "DELETE FROM `exhibition items` WHERE "
+                 + "`ID` = " + id;
+    try {
+        stmt.executeUpdate(query);
+        System.out.println("Data deleted successfully");
+    } catch (SQLException e) {
+        System.out.println(e.getMessage() + " - Error deleting data");
+    }
+}
+
+
+  
 public void view(){
-    ticketTypes1.clear();
-    ticketTypes2.clear();
-    ticketTypes3.clear();
+    ticketStoring.clear();
     try {
         String insertquery = "SELECT * FROM `ticket type`";
         ResultSet result = stmt.executeQuery(insertquery);
         while(result.next()){
-            ticketTypes1.add(result.getString(2));
-            ticketTypes2.add(result.getString(3));
-            ticketTypes3.add(result.getString(4));         
+            ticket = new Ticket (result.getString(2), result.getString(3), Double.parseDouble(result.getString(4)));
+            ticketStoring.add(ticket);
         }
-        System.out.println(ticketTypes1);
-        System.out.println(ticketTypes2);
-        System.out.println(ticketTypes3);
-        
     } catch (SQLException ex) {
         System.out.println("Problem To Show Data");
     }
  }
 
 public void view2(){
-    name.clear();
-    description.clear();
-    regionOfOrigin.clear();
-    yearOfProduction.clear();
-    roomPlacement.clear();
+    itemStoring.clear();
     try {
         String insertquery = "SELECT * FROM `exhibition items`";
         ResultSet result = stmt.executeQuery(insertquery);
         while(result.next()){
-            name.add(result.getString(2));
-            description.add(result.getString(3));
-            regionOfOrigin.add(result.getString(4));
-            yearOfProduction.add(result.getString(5));
-            roomPlacement.add(result.getString(6));
-        }
- 
-        System.out.println(name);
-        
+            item = new Item (Integer.parseInt(result.getString(1)),result.getString(2), result.getString(3), result.getString(4), Integer.parseInt(result.getString(5)), Integer.parseInt(result.getString(6)));
+            itemStoring.add(item);
+        }      
     } catch (SQLException ex) {
         System.out.println("Problem To Show Data");
     }

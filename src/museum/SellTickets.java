@@ -1,16 +1,21 @@
 package museum;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-public class SellTickets extends JPanel {
+public class SellTickets extends JPanel implements ActionListener {
     private TimePanel timePanel = new TimePanel();
     private DiscountPanel discountPanel = new DiscountPanel();
     private TicketTable ticketTable;
+    private JButton addDataButton = new JButton("Add data");
+    private Database db;
 
     public SellTickets(Database db) {
-        ticketTable = new TicketTable(db);
+        this.db = db;
+        ticketTable = new TicketTable();
         this.setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel();
@@ -20,6 +25,8 @@ public class SellTickets extends JPanel {
 
         this.add(topPanel, BorderLayout.NORTH);
         this.add(new JScrollPane(ticketTable), BorderLayout.CENTER);
+        addDataButton.addActionListener(this);
+        this.add(addDataButton, BorderLayout.SOUTH);
     }
 
     class TimePanel extends JPanel {
@@ -57,26 +64,43 @@ public class SellTickets extends JPanel {
     }
 
     class TicketTable extends JTable {
-        public final String[] columnNames = {"Ticket type", "Ticket price", "Ticket description"};
-        public Object[][] data;
+        private final String[] columnNames = {"Ticket type", "Ticket description", "Ticket price"};
+        private DefaultTableModel model;
 
-        public TicketTable(Database db) {
-            data = getTableData(db);
-            DefaultTableModel model = new DefaultTableModel(data, columnNames);
-            this.setModel(model);
+        public TicketTable() {
+            updateModel();
             this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             this.getTableHeader().setReorderingAllowed(false);
         }
 
-        public Object[][] getTableData(Database db) {
-            int size = db.ticketTypes1.size();
-            data = new Object[size][3];
+        public void updateModel() {
+            Object[][] data = getTableData();
+            model = new DefaultTableModel(data, columnNames);
+            this.setModel(model);
+        }
+
+        public Object[][] getTableData() {
+            int size = db.ticketStoring.size();
+            Object[][] data = new Object[size][3];
             for (int i = 0; i < size; i++) {
-                data[i][0] = db.ticketTypes1.get(i);
-                data[i][1] = db.ticketTypes2.get(i);
-                data[i][2] = db.ticketTypes3.get(i);
+                data[i][0] = db.ticketStoring.get(i).getTicketType();
+                data[i][1] = db.ticketStoring.get(i).getTicketDescription();
+                data[i][2] = db.ticketStoring.get(i).getTicketPrice();
             }
             return data;
+        }
+
+        public String[] getColumnNames() {
+            return columnNames;
+        }
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == addDataButton) {
+           db.insertData2();
+           db.view();
+           ticketTable.updateModel();
         }
     }
 }
