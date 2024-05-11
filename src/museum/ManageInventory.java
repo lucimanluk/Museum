@@ -68,7 +68,7 @@ public class ManageInventory extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == addDataButton) {
-            frame = new DataAddingFrame(db);
+            frame = new DataAddingFrame(db, this::getTableData, model, columnNames, tabelManagementInvetory);
         } else if (e.getSource() == deleteDataButton) {
             int[] selection = tabelManagementInvetory.getSelectedRows();
             if (selection.length > 0) {

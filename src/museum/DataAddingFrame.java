@@ -1,12 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package museum;
 
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import javax.swing.table.DefaultTableModel;
 
 public class DataAddingFrame extends JFrame implements ActionListener {
 
@@ -22,12 +19,19 @@ public class DataAddingFrame extends JFrame implements ActionListener {
     private JTextField roomField = new JTextField(20);
     private final JButton addDataButton2 = new JButton("Add data");
     private final JButton closeFrame = new JButton("Close");
+    private TableDataFetcher dataFetcher;
+    private DefaultTableModel model;
+    private String[] columnNames;
+    private JTable tabelManagementInventory;
     private Database db;
 
-    public DataAddingFrame(Database db) {
+    public DataAddingFrame(Database db, TableDataFetcher dataFetcher, DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory) {
         this.db = db;
-
-        setLayout(new GridLayout(6,2));
+        this.dataFetcher = dataFetcher;
+        this.model = model;
+        this.columnNames = columnNames;
+        this.tabelManagementInventory = tabelManagementInventory;
+        setLayout(new GridLayout(6, 2));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         add(nameLabel);
@@ -53,13 +57,19 @@ public class DataAddingFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addDataButton2) {
-            if (!nameField.getText().isEmpty() && !descriptionField.getText().isEmpty() && !regionField.getText().isEmpty() && !yearField.getText().isEmpty() && !roomField.getText().isEmpty()) {
-                db.insertData();
+            if (!nameField.getText().isEmpty()
+                    && !descriptionField.getText().isEmpty()
+                    && !regionField.getText().isEmpty()
+                    && !yearField.getText().isEmpty()
+                    && !roomField.getText().isEmpty()) {
+                db.insertData(nameField.getText(), descriptionField.getText(), regionField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(roomField.getText()));
                 db.view2();
+                Object[][] newData = dataFetcher.fetchTableData();
+                model.setDataVector(newData, columnNames);
+                tabelManagementInventory.removeColumn(tabelManagementInventory.getColumnModel().getColumn(0));
             }
         } else if (e.getSource() == closeFrame) {
             dispose();
         }
-
     }
 }

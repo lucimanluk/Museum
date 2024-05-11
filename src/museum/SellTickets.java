@@ -1,106 +1,74 @@
 package museum;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.*;
 
 public class SellTickets extends JPanel implements ActionListener {
-    private TimePanel timePanel = new TimePanel();
-    private DiscountPanel discountPanel = new DiscountPanel();
-    private TicketTable ticketTable;
-    private JButton addDataButton = new JButton("Add data");
+
+    private JTable ticketTable;
+    private DefaultTableModel model;
+    private final JButton addDataButton = new JButton("Add data");
+    private final JButton deleteDataButton = new JButton("Delete data");
+    private DataAddingFrame2 frame;
     private Database db;
+    public Object[][] data;
+    public final String[] columnNames = {"ID", "Ticket type", "Ticket description", "Ticket price"};
 
     public SellTickets(Database db) {
         this.db = db;
-        ticketTable = new TicketTable();
+        data = getTableData();
+        model = new DefaultTableModel(data, columnNames);
+        ticketTable = new JTable(model);
+        ticketTable.getTableHeader().setReorderingAllowed(false);
         this.setLayout(new BorderLayout());
-
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));  
-        topPanel.add(timePanel);
-        topPanel.add(discountPanel);
-
-        this.add(topPanel, BorderLayout.NORTH);
         this.add(new JScrollPane(ticketTable), BorderLayout.CENTER);
         addDataButton.addActionListener(this);
+        deleteDataButton.addActionListener(this);
         this.add(addDataButton, BorderLayout.SOUTH);
+        this.add(deleteDataButton, BorderLayout.EAST);
+        ticketTable.removeColumn(ticketTable.getColumnModel().getColumn(0));
     }
 
-    class TimePanel extends JPanel {
-        public JRadioButton buttonMorning = new JRadioButton("9-17");
-        public JRadioButton buttonEvening = new JRadioButton("17-20");
-        public ButtonGroup hourGroup = new ButtonGroup();
-
-        public TimePanel() {
-            setLayout(new FlowLayout());
-            hourGroup.add(buttonMorning);
-            hourGroup.add(buttonEvening);
-            add(buttonMorning);
-            add(buttonEvening);
+    public Object[][] getTableData() {
+        int size = db.ticketStoring.size();
+        data = new Object[size][4];
+        for (int i = 0; i < size; i++) {
+            data[i][0] = db.ticketStoring.get(i).getId();
+            data[i][1] = db.ticketStoring.get(i).getTicketType();
+            data[i][2] = db.ticketStoring.get(i).getTicketDescription();
+            data[i][3] = db.ticketStoring.get(i).getTicketPrice();
         }
-    }
-
-    class DiscountPanel extends JPanel {
-        public final JRadioButton buttonRetirees = new JRadioButton("Retirees");
-        public final JRadioButton buttonSoldiers = new JRadioButton("Soldiers");
-        public final JRadioButton buttonStudents = new JRadioButton("Students");
-        public final JRadioButton buttonNoDiscount = new JRadioButton("No discount");
-        public final ButtonGroup discountGroup = new ButtonGroup();
-        
-        public DiscountPanel() {
-            setLayout(new FlowLayout());
-            discountGroup.add(buttonRetirees);
-            discountGroup.add(buttonSoldiers);
-            discountGroup.add(buttonStudents);
-            discountGroup.add(buttonNoDiscount);
-            add(buttonRetirees);
-            add(buttonSoldiers);
-            add(buttonStudents);
-            add(buttonNoDiscount);
-        }
-    }
-
-    class TicketTable extends JTable {
-        private final String[] columnNames = {"Ticket type", "Ticket description", "Ticket price"};
-        private DefaultTableModel model;
-
-        public TicketTable() {
-            updateModel();
-            this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            this.getTableHeader().setReorderingAllowed(false);
-        }
-
-        public void updateModel() {
-            Object[][] data = getTableData();
-            model = new DefaultTableModel(data, columnNames);
-            this.setModel(model);
-        }
-
-        public Object[][] getTableData() {
-            int size = db.ticketStoring.size();
-            Object[][] data = new Object[size][3];
-            for (int i = 0; i < size; i++) {
-                data[i][0] = db.ticketStoring.get(i).getTicketType();
-                data[i][1] = db.ticketStoring.get(i).getTicketDescription();
-                data[i][2] = db.ticketStoring.get(i).getTicketPrice();
-            }
-            return data;
-        }
-
-        public String[] getColumnNames() {
-            return columnNames;
-        }
+        return data;
     }
     
+    public void resetFrame() {
+    this.frame = null;
+}
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addDataButton) {
-           db.insertData2();
-           db.view();
-           ticketTable.updateModel();
+        if(frame == null)
+            this.frame = new DataAddingFrame2(db, this::getTableData, model, columnNames, ticketTable, this);
+        } else if (e.getSource() == deleteDataButton) {
+            int[] selection = ticketTable.getSelectedRows();
+            if (selection.length > 0) {
+                int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete selected items?", "Delete Confirmation", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    for (int i = selection.length - 1; i >= 0; i--) {
+                        int viewIndex = selection[i];
+                        int modelIndex = ticketTable.convertRowIndexToModel(viewIndex);
+                        int idToDelete = Integer.parseInt(model.getValueAt(modelIndex, 0).toString());
+                        db.deleteData2(idToDelete);
+                        model.removeRow(modelIndex);
+                    }
+                    db.view();
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a row to delete");
+            }
         }
     }
 }
