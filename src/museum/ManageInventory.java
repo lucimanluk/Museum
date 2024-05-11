@@ -4,15 +4,19 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ManageInventory extends JPanel implements ActionListener {
 
-    private JTable tabelManagementInvetory;
-    private DefaultTableModel model;
+    public JTable tabelManagementInvetory;
+    public DefaultTableModel model;
     private final JButton addDataButton = new JButton("Add data");
     private final JButton deleteDataButton = new JButton("Delete data");
-    private Object[][] data;
-    private final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
+    private DataAddingFrame frame;
+    public Object[][] data;
+    public final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
     private Database db;
 
     //constructor
@@ -31,6 +35,19 @@ public class ManageInventory extends JPanel implements ActionListener {
         tabelManagementInvetory.removeColumn(tabelManagementInvetory.getColumnModel().getColumn(0));
     }
 
+    /*public Object[][] getTableData() {
+        // Using Stream API to transform the List to Object[][]
+        return db.itemStoring.stream()
+            .map(item -> new Object[] {
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getRegionOfOrigin(),
+                item.getYear(),
+                item.getRoom()
+            })
+            .toArray(Object[][]::new); // Collecting the results into a 2D array
+    }*/
     //metoda de apelare a bazei de date
     public Object[][] getTableData() {
         int size = db.itemStoring.size();
@@ -51,29 +68,25 @@ public class ManageInventory extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == addDataButton) {
-            db.insertData();
-            db.view2();
-            data = getTableData();
-            model.setDataVector(data, columnNames);
-            tabelManagementInvetory.removeColumn(tabelManagementInvetory.getColumnModel().getColumn(0));
+            frame = new DataAddingFrame(db);
         } else if (e.getSource() == deleteDataButton) {
-    int[] selection = tabelManagementInvetory.getSelectedRows();
-        if (selection.length > 0) {
-        int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete selected items?", "Delete Confirmation", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            for (int i = selection.length - 1; i >= 0; i--) {
-                int viewIndex = selection[i];
-                int modelIndex = tabelManagementInvetory.convertRowIndexToModel(viewIndex); 
-                int idToDelete = Integer.parseInt(model.getValueAt(modelIndex, 0).toString()); 
-                db.deleteData(idToDelete);
-                model.removeRow(modelIndex);
+            int[] selection = tabelManagementInvetory.getSelectedRows();
+            if (selection.length > 0) {
+                int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete selected items?", "Delete Confirmation", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    for (int i = selection.length - 1; i >= 0; i--) {
+                        int viewIndex = selection[i];
+                        int modelIndex = tabelManagementInvetory.convertRowIndexToModel(viewIndex);
+                        int idToDelete = Integer.parseInt(model.getValueAt(modelIndex, 0).toString());
+                        db.deleteData(idToDelete);
+                        model.removeRow(modelIndex);
+                    }
+                    db.view2();
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a row to delete");
             }
-            db.view2();
         }
-    } else {
-        JOptionPane.showMessageDialog(null, "Please select a row to delete");
-    }
-}
 
     }
 }
