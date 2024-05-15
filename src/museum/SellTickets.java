@@ -13,10 +13,10 @@ public class SellTickets extends JPanel implements ActionListener {
     private final JLabel videoTaxLabel = new JLabel("Videography tax");
     private JTextField ticketCountTextField = new JTextField(30);
     private final JRadioButton hour1 = new JRadioButton("9-17");
-    private final JRadioButton hour2 = new JRadioButton("17-20");
-    private final JRadioButton student = new JRadioButton("Student(50% off)");
-    private final JRadioButton retiree = new JRadioButton("Retiree(50% off)");
-    private final JRadioButton veteran = new JRadioButton("Veteran(100% off)");
+    private final JRadioButton hour2 = new JRadioButton("17-20 (10% higher price)");
+    private final JRadioButton student = new JRadioButton("Student (50% off)");
+    private final JRadioButton retiree = new JRadioButton("Retiree (50% off)");
+    private final JRadioButton veteran = new JRadioButton("Veteran (75% off)");
     private final JRadioButton noDiscount = new JRadioButton("No discount");
     private final ButtonGroup hourGroup = new ButtonGroup();
     private final ButtonGroup discountGroup = new ButtonGroup();
@@ -77,6 +77,7 @@ public class SellTickets extends JPanel implements ActionListener {
         addDataButton.addActionListener(this);
         deleteDataButton.addActionListener(this);
         addTicketsButton.addActionListener(this);
+        deleteTicketsButton.addActionListener(this);
         this.add(addDataButton);
         this.add(deleteDataButton);
         this.add(new JScrollPane(orderTable));
@@ -144,21 +145,45 @@ public class SellTickets extends JPanel implements ActionListener {
             if (selection.length > 0) {
                 for (int i = 0; i < selection.length; i++) {
                     for (int j = 0; j < ticketsNumber; j++) {
-                        double price = db.ticketStoring.get(i).getTicketPrice();
+                        int modelIndex = ticketTable.convertRowIndexToModel(selection[i]);
+                        double price = Double.parseDouble(ticketTableModel.getValueAt(modelIndex, 3).toString());
+                        String ticketType = ticketTableModel.getValueAt(modelIndex, 1).toString();
+                        if(hourGroup.getSelection().getActionCommand() == "17-20"){
+                            price = price + (1.0/10.0)*price;
+                        }
                         if (String.valueOf(comboBoxPhoto.getSelectedItem()) == "Yes") {
-                            price = price + 20;
+                            price = price + (1.0/20.0)*price;
                         }
                         if (String.valueOf(comboBoxVideo.getSelectedItem()) == "Yes") {
-                            price = price + 20;
+                            price = price + (1.0/10.0)*price;
                         }
-                        if (discountGroup.getSelection().getActionCommand() == "student") {
-                            price = price / 2;
+                        if (discountGroup.getSelection().getActionCommand() == "student" || discountGroup.getSelection().getActionCommand() == "retiree") {
+                            price = price/2;
                         }
-                        orderStoring.add(orderItem = new OrderItem(hourGroup.getSelection().getActionCommand(), discountGroup.getSelection().getActionCommand(), db.ticketStoring.get(i).getTicketType(), String.valueOf(comboBoxPhoto.getSelectedItem()), String.valueOf(comboBoxVideo.getSelectedItem()), price));
-                        data2 = getTableData2();
-                        orderTableModel.setDataVector(data2, columnNames2);
+                        else if(discountGroup.getSelection().getActionCommand() == "veteran"){
+                            price = price/4;
+                        }
+                        orderStoring.add(orderItem = new OrderItem(hourGroup.getSelection().getActionCommand(), discountGroup.getSelection().getActionCommand(), ticketType , String.valueOf(comboBoxPhoto.getSelectedItem()), String.valueOf(comboBoxVideo.getSelectedItem()), price));
                     }
                 }
+                data2 = getTableData2();
+                orderTableModel.setDataVector(data2, columnNames2);
+            }
+        } else if (e.getSource() == deleteTicketsButton) {
+           int[] selection = orderTable.getSelectedRows();
+           if (selection.length > 0) {
+                int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete selected items?", "Delete Confirmation", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    for (int i = selection.length - 1; i >= 0; i--) {
+                        int viewIndex = selection[i];
+                        int modelIndex = orderTable.convertRowIndexToModel(viewIndex);                        
+                        orderTableModel.removeRow(modelIndex);
+                        orderStoring.remove(viewIndex);
+                    }
+                    System.out.println(orderStoring.size());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Please select a row to delete");
             }
         }
     }
