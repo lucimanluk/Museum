@@ -12,7 +12,7 @@ public class Museum {
         db.view();
         db.view2();
         SellTickets se1lTicketsPage = new SellTickets(db);
-        Reservation reservationPage = new Reservation();
+        ReservationPane reservationPage = new ReservationPane();
         ManageInventory managePage = new ManageInventory(db);
         JPanel page4 = new JPanel();
 
