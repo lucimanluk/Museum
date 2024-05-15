@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 
 public class ManageInventory extends JPanel implements ActionListener {
 
-    public JTable tabelManagementInvetory;
-    public DefaultTableModel model;
+    private JTable tabelManagementInvetory;
+    private DefaultTableModel model;
     private final JButton addDataButton = new JButton("Add data");
     private final JButton deleteDataButton = new JButton("Delete data");
     private DataAddingFrame frame;
@@ -19,7 +19,6 @@ public class ManageInventory extends JPanel implements ActionListener {
     public final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
     private Database db;
 
-    //constructor
     public ManageInventory(Database db) {
         this.db = db;
         data = getTableData();
