@@ -11,8 +11,9 @@ public class Museum {
     public Museum() {
         db.view();
         db.view2();
+        db.view3();
         SellTickets se1lTicketsPage = new SellTickets(db);
-        ReservationPane reservationPage = new ReservationPane();
+        ReservationPane reservationPage = new ReservationPane(db);
         ManageInventory managePage = new ManageInventory(db);
         JPanel page4 = new JPanel();
 

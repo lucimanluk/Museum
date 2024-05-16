@@ -8,7 +8,7 @@ import java.time.format.*;
 import java.util.*;
 import javax.swing.table.DefaultTableModel;
 
-public class ReservationPane extends JPanel implements KeyListener {
+public class ReservationPane extends JPanel implements KeyListener, ActionListener {
 
     private final JLabel firstNameLabel = new JLabel("First name");
     private JTextField firstNameTextField = new JTextField(20);
@@ -25,18 +25,23 @@ public class ReservationPane extends JPanel implements KeyListener {
     private LocalDateTime currentTime = LocalDateTime.now();
     private DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
     private String formattedDate = currentTime.format(myFormatObj);
-    private final JButton addReservationButton = new JButton ("Add reservation");
+    private final JButton addReservationButton = new JButton("Add reservation");
     private Object[][] data;
-    private final String[] columnNames = {"Name", "Phone number", "Number of tickets", "Date and time"};
+    private final String[] columnNames = {"Id", "Name", "Phone number", "Number of tickets", "Date and time"};
     private DefaultTableModel model;
     private JTable reservationTable;
+    private Database db;
 
-    public ReservationPane() {
+    public ReservationPane(Database db) {
 
+        this.db = db;
+        data = getTableData();
         this.setLayout(new GridLayout(2,1));
         phoneNumberTextField.addKeyListener(this);
+        addReservationButton.addActionListener(this);
         dateTimeTextField = new JTextField(formattedDate);
         namePanel.setLayout(new GridBagLayout());
+        namePanel.setBorder(BorderFactory.createTitledBorder("Reservation information"));
         ticketAmountBox.setPreferredSize(new Dimension(50, 25));
         namePanel.add(firstNameLabel, createGridBagConstraints(0, 0));
         namePanel.add(firstNameTextField, createGridBagConstraints(1, 0));
@@ -48,11 +53,12 @@ public class ReservationPane extends JPanel implements KeyListener {
         namePanel.add(ticketAmountBox, createGridBagConstraints(1, 3));
         namePanel.add(dateTimeLabel, createGridBagConstraints(0, 4));
         namePanel.add(dateTimeTextField, createGridBagConstraints(1, 4));
-        namePanel.add(addReservationButton, createGridBagConstraints(1,5));
+        namePanel.add(addReservationButton, createGridBagConstraints(1, 5));
         this.add(namePanel);
         model = new DefaultTableModel(data, columnNames);
         reservationTable = new JTable(model);
         this.add(new JScrollPane(reservationTable));
+        reservationTable.removeColumn(reservationTable.getColumnModel().getColumn(0));
     }
 
     public GridBagConstraints createGridBagConstraints(int x, int y) {
@@ -61,6 +67,44 @@ public class ReservationPane extends JPanel implements KeyListener {
         gbc.gridy = y;
         gbc.insets = new Insets(2, 2, 2, 2);
         return gbc;
+    }
+
+    public Object[][] getTableData() {
+        return db.reservationStoring.stream()
+                .map(item -> new Object[]{
+            item.getId(),
+            item.getName(),
+            item.getPhoneNumber(),
+            item.getNumberOfTickets(),
+            item.getDateTime()
+        })
+                .toArray(Object[][]::new);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == addReservationButton) {
+            if (!firstNameTextField.getText().isEmpty()
+                    && !lastNameTextField.getText().isEmpty()
+                    && phoneNumberTextField.getText().length() == 10
+                    && !dateTimeTextField.getText().isEmpty()) {
+                String name = lastNameTextField.getText() + " " + firstNameTextField.getText();
+                System.out.println(name);
+                db.insertData3(name, Integer.parseInt(phoneNumberTextField.getText()), Integer.parseInt(ticketAmountBox.getSelectedItem().toString()), dateTimeTextField.getText());
+                db.view3();
+                data = getTableData();
+                model.setDataVector(data, columnNames);
+                reservationTable.removeColumn(reservationTable.getColumnModel().getColumn(0));
+            } else if (phoneNumberTextField.getText().length() < 10
+                    && phoneNumberTextField.getText().length() >= 1
+                    && !firstNameTextField.getText().isEmpty()
+                    && !lastNameTextField.getText().isEmpty()
+                    && !dateTimeTextField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Phone number not long enough.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Please fill all the fiellds.");
+            }
+        }
     }
 
     @Override

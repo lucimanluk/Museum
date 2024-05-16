@@ -34,8 +34,7 @@ public class ManageInventory extends JPanel implements ActionListener {
         tabelManagementInvetory.removeColumn(tabelManagementInvetory.getColumnModel().getColumn(0));
     }
 
-    /*public Object[][] getTableData() {
-        // Using Stream API to transform the List to Object[][]
+    public Object[][] getTableData() {
         return db.itemStoring.stream()
             .map(item -> new Object[] {
                 item.getId(),
@@ -45,24 +44,9 @@ public class ManageInventory extends JPanel implements ActionListener {
                 item.getYear(),
                 item.getRoom()
             })
-            .toArray(Object[][]::new); // Collecting the results into a 2D array
-    }*/
-    //metoda de apelare a bazei de date
-    public Object[][] getTableData() {
-        int size = db.itemStoring.size();
-        data = new Object[size][6];
-        for (int i = 0; i < size; i++) {
-            data[i][0] = db.itemStoring.get(i).getId();
-            data[i][1] = db.itemStoring.get(i).getName();
-            data[i][2] = db.itemStoring.get(i).getDescription();
-            data[i][3] = db.itemStoring.get(i).getRegionOfOrigin();
-            data[i][4] = db.itemStoring.get(i).getYear();
-            data[i][5] = db.itemStoring.get(i).getRoom();
-        }
-        return data;
+            .toArray(Object[][]::new);
     }
 
-    //metoda pentru a adauga sau a scoate data din tabel
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -83,7 +67,7 @@ public class ManageInventory extends JPanel implements ActionListener {
                     db.view2();
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Please select a row to delete");
+                JOptionPane.showMessageDialog(null, "Please select a row to delete.");
             }
         }
 

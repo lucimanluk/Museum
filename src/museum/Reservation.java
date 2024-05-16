@@ -5,8 +5,38 @@
 package museum;
 
 public class Reservation {
-   private String name;
-   private int phoneNumber;
-   private int numberOfTickets;
-   private String dateTime;
+
+    private int id;
+    private String name;
+    private int phoneNumber;
+    private int numberOfTickets;
+    private String dateTime;
+
+    public Reservation(int id, String name, int phoneNumber, int numberOfTickets, String dateTime) {
+        this.id = id;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.numberOfTickets = numberOfTickets;
+        this.dateTime = dateTime;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public int getNumberOfTickets() {
+        return this.numberOfTickets;
+    }
+
+    public String getDateTime() {
+        return this.dateTime;
+    }
 }

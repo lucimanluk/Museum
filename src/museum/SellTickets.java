@@ -29,8 +29,10 @@ public class SellTickets extends JPanel implements ActionListener {
     private final JButton addTicketsButton = new JButton("Add to order");
     private final JButton deleteTicketsButton = new JButton("Delete items");
     private final String[] options = {"No", "Yes"};
+    private final String[] paymentOptions = {"Cash", "Card"};
     private final JComboBox comboBoxPhoto = new JComboBox(options);
     private final JComboBox comboBoxVideo = new JComboBox(options);
+    private final JComboBox comboBoxPayment = new JComboBox(paymentOptions);
     private DataAddingFrame2 frame;
     private Database db;
     private Object[][] data;
@@ -83,19 +85,19 @@ public class SellTickets extends JPanel implements ActionListener {
         this.add(new JScrollPane(orderTable));
         this.add(addTicketsButton);
         this.add(deleteTicketsButton);
+        this.add(comboBoxPayment);
         ticketTable.removeColumn(ticketTable.getColumnModel().getColumn(0));
     }
 
     public Object[][] getTableData() {
-        int size = db.ticketStoring.size();
-        data = new Object[size][4];
-        for (int i = 0; i < size; i++) {
-            data[i][0] = db.ticketStoring.get(i).getId();
-            data[i][1] = db.ticketStoring.get(i).getTicketType();
-            data[i][2] = db.ticketStoring.get(i).getTicketDescription();
-            data[i][3] = db.ticketStoring.get(i).getTicketPrice();
-        }
-        return data;
+        return db.ticketStoring.stream()
+            .map(item -> new Object[] {
+                item.getId(),
+                item.getTicketType(),
+                item.getTicketDescription(),
+                item.getTicketPrice()
+            })
+            .toArray(Object[][]::new);
     }
 
     public Object[][] getTableData2() {
@@ -137,7 +139,7 @@ public class SellTickets extends JPanel implements ActionListener {
                     db.view();
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Please select a row to delete");
+                JOptionPane.showMessageDialog(null, "Please select a row to delete.");
             }
         } else if (e.getSource() == addTicketsButton) {
             int[] selection = ticketTable.getSelectedRows();
@@ -183,7 +185,7 @@ public class SellTickets extends JPanel implements ActionListener {
                     System.out.println(orderStoring.size());
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Please select a row to delete");
+                JOptionPane.showMessageDialog(null, "Please select a row to delete.");
             }
         }
     }

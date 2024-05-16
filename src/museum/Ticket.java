@@ -19,16 +19,16 @@ public int getId() {
     return this.Id;
 }
 
+public String getTicketDescription() {
+    return this.ticketDescription;
+}
+
 public String getTicketType() {
     return this.ticketType;
 }
 
 public double getTicketPrice() {
     return this.ticketPrice;
-}
-
-public String getTicketDescription() {
-    return this.ticketDescription;
 }
 
 public void setId(int Id) {
