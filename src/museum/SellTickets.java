@@ -34,7 +34,7 @@ public class SellTickets extends JPanel implements ActionListener {
     private final JComboBox comboBoxVideo = new JComboBox(options);
     private final JComboBox comboBoxPayment = new JComboBox(paymentOptions);
     private DataAddingFrame2 frame;
-    private Database db;
+    private Database db = Database.getInstance();
     private Object[][] data;
     private Object[][] data2;
     private OrderItem orderItem;
@@ -42,8 +42,9 @@ public class SellTickets extends JPanel implements ActionListener {
     private final String[] columnNames = {"ID", "Ticket type", "Ticket description", "Ticket price"};
     private final String[] columnNames2 = {"Time period", "Discount type", "Ticket type", "Photo tax", "Video tax", "Price"};
 
-    public SellTickets(Database db) {
-        this.db = db;
+    public SellTickets() {
+        JPanel this1 = new JPanel();
+        this1.setLayout(new GridBagLayout());
         data = getTableData();
         ticketTableModel = new DefaultTableModel(data, columnNames);
         ticketTable = new JTable(ticketTableModel);
@@ -51,8 +52,8 @@ public class SellTickets extends JPanel implements ActionListener {
         orderTableModel = new DefaultTableModel(data2, columnNames2);
         orderTable = new JTable(orderTableModel);
         this.setLayout(new FlowLayout());
-        this.add(ticketCountLabel);
-        this.add(ticketCountTextField);
+        this1.add(ticketCountLabel, createGridBagConstraints(0,0));
+        this1.add(ticketCountTextField, createGridBagConstraints(1,0));
         hour1.setActionCommand("9-17");
         hour2.setActionCommand("17-20");
         hourGroup.add(hour1);
@@ -65,16 +66,17 @@ public class SellTickets extends JPanel implements ActionListener {
         retiree.setActionCommand("retiree");
         veteran.setActionCommand("veteran");
         noDiscount.setActionCommand("no discount");
-        this.add(hour1);
-        this.add(hour2);
-        this.add(student);
-        this.add(retiree);
-        this.add(veteran);
-        this.add(noDiscount);
-        this.add(photoTaxLabel);
-        this.add(comboBoxPhoto);
-        this.add(videoTaxLabel);
-        this.add(comboBoxVideo);
+        this1.add(hour1, createGridBagConstraints(0,1));
+        this1.add(hour2, createGridBagConstraints(1,1));
+        this1.add(student, createGridBagConstraints(0,2));
+        this1.add(retiree, createGridBagConstraints(1,2));
+        this1.add(veteran, createGridBagConstraints(0,3));
+        this1.add(noDiscount, createGridBagConstraints(1,3));
+        this1.add(photoTaxLabel, createGridBagConstraints(0,4));
+        this1.add(comboBoxPhoto, createGridBagConstraints(1,4));
+        this1.add(videoTaxLabel, createGridBagConstraints(0,5));
+        this1.add(comboBoxVideo, createGridBagConstraints(1,5));
+        this.add(this1);
         this.add(new JScrollPane(ticketTable));
         addDataButton.addActionListener(this);
         deleteDataButton.addActionListener(this);
@@ -118,6 +120,15 @@ public class SellTickets extends JPanel implements ActionListener {
         this.frame = null;
     }
 
+    public GridBagConstraints createGridBagConstraints(int x, int y) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        return gbc;
+    }
+
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addDataButton) {

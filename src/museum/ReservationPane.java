@@ -30,11 +30,9 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
     private final String[] columnNames = {"Id", "Name", "Phone number", "Number of tickets", "Date and time"};
     private DefaultTableModel model;
     private JTable reservationTable;
-    private Database db;
+    private Database db = Database.getInstance();
 
-    public ReservationPane(Database db) {
-
-        this.db = db;
+    public ReservationPane() {
         data = getTableData();
         this.setLayout(new GridLayout(2,1));
         phoneNumberTextField.addKeyListener(this);
@@ -69,6 +67,7 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
         return gbc;
     }
 
+    
     public Object[][] getTableData() {
         return db.reservationStoring.stream()
                 .map(item -> new Object[]{

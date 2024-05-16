@@ -16,7 +16,7 @@ public class Database {
     public ArrayList<Item> itemStoring = new ArrayList<Item>();
     public ArrayList<Reservation> reservationStoring = new ArrayList<Reservation>();
 
-    public Database() {
+    private Database() {
         try {
             String url = "jdbc:mysql://localhost:3306/emuseum";
             String username = "root";
@@ -25,6 +25,13 @@ public class Database {
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "eroare din conexiune");
         }
+    }
+
+    public static Database getInstance() {
+        if (instance == null) {
+            instance = new Database();
+        }
+        return instance;
     }
 
     public Statement getStatement() {
@@ -39,13 +46,6 @@ public class Database {
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "eroare la inchidere");
         }
-    }
-
-    public static Database getInstance() {
-        if (instance == null) {
-            instance = new Database();
-        }
-        return instance;
     }
 
     public void insertData(String name, String description, String region, int year, int room) {

@@ -17,10 +17,9 @@ public class ManageInventory extends JPanel implements ActionListener {
     private DataAddingFrame frame;
     public Object[][] data;
     public final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
-    private Database db;
+    private Database db = Database.getInstance();
 
-    public ManageInventory(Database db) {
-        this.db = db;
+    public ManageInventory() {
         data = getTableData();
         model = new DefaultTableModel(data, columnNames);
         tabelManagementInvetory = new JTable(model);
