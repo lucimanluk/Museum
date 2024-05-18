@@ -13,43 +13,51 @@ import java.util.stream.Stream;
 
 public class ManageInventory extends JPanel implements ActionListener {
 
+    private static final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
+    
+    private Object[][] data;
+    
     private JTable tabelManagementInvetory;
     private DefaultTableModel model;
-    private final JButton addDataButton = new JButton("Add data");
-    private final JButton deleteDataButton = new JButton("Delete data");
+    private JButton addDataButton = new JButton("Add data");
+    private JButton deleteDataButton = new JButton("Delete data");
     private DataAddingFrame frame;
-    private Object[][] data;
-    private final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
+    
     private Item item;
     public ArrayList<Item> itemStoring = new ArrayList<Item>();
     private Database db = Database.getInstance();
 
     public ManageInventory() {
+        
+        this.setLayout(new FlowLayout());
+        
         getExhibitionItemsData();
         data = getTableData();
         model = new DefaultTableModel(data, columnNames);
         tabelManagementInvetory = new JTable(model);
         tabelManagementInvetory.getTableHeader().setReorderingAllowed(false);
-        this.setLayout(new FlowLayout());
         this.add(new JScrollPane(tabelManagementInvetory));
+        
         addDataButton.addActionListener(this);
         deleteDataButton.addActionListener(this);
+        
         this.add(addDataButton);
         this.add(deleteDataButton);
+        
         tabelManagementInvetory.removeColumn(tabelManagementInvetory.getColumnModel().getColumn(0));
     }
 
     public Object[][] getTableData() {
         return itemStoring.stream()
-            .map(item -> new Object[] {
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getRegionOfOrigin(),
-                item.getYear(),
-                item.getRoom()
-            })
-            .toArray(Object[][]::new);
+                .map(item -> new Object[]{
+            item.getId(),
+            item.getName(),
+            item.getDescription(),
+            item.getRegionOfOrigin(),
+            item.getYear(),
+            item.getRoom()
+        })
+                .toArray(Object[][]::new);
     }
 
     public void insertIntoExhibitionTable(String name, String description, String region, int year, int room) {
@@ -61,8 +69,8 @@ public class ManageInventory extends JPanel implements ActionListener {
             System.out.println(e.getMessage() + " - Error inserting data");
         }
     }
-    
-     public void deleteFromExhibitionItemsTable(int id) {
+
+    public void deleteFromExhibitionItemsTable(int id) {
         String query = "DELETE FROM `exhibition items` WHERE "
                 + "`ID` = " + id;
         try {
@@ -72,8 +80,8 @@ public class ManageInventory extends JPanel implements ActionListener {
             System.out.println(e.getMessage() + " - Error deleting data");
         }
     }
-     
-     public void getExhibitionItemsData() {
+
+    public void getExhibitionItemsData() {
         itemStoring.clear();
         try {
             String insertquery = "SELECT * FROM `exhibition items`";
@@ -86,7 +94,7 @@ public class ManageInventory extends JPanel implements ActionListener {
             System.out.println("Problem To Show Data");
         }
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
 

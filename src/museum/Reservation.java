@@ -6,10 +6,10 @@ package museum;
 
 public class Reservation {
 
-    private int id, phoneNumber, numberOfTickets;
-    private String name, dateTime;
+    private int id, numberOfTickets;
+    private String name,phoneNumber, dateTime;
 
-    public Reservation(int id, String name, int phoneNumber, int numberOfTickets, String dateTime) {
+    public Reservation(int id, String name, String phoneNumber, int numberOfTickets, String dateTime) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -25,7 +25,7 @@ public class Reservation {
         return this.name;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return this.phoneNumber;
     }
 

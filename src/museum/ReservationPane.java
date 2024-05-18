@@ -12,17 +12,17 @@ import javax.swing.table.DefaultTableModel;
 
 public class ReservationPane extends JPanel implements KeyListener, ActionListener {
 
-    private final JLabel firstNameLabel = new JLabel("First name");
+    private JLabel firstNameLabel = new JLabel("First name");
     private JTextField firstNameTextField = new JTextField(20);
-    private final JLabel lastNameLabel = new JLabel("Last name");
+    private JLabel lastNameLabel = new JLabel("Last name");
     private JTextField lastNameTextField = new JTextField(20);
-    private final JLabel phoneNumberLabel = new JLabel("Phone number");
+    private JLabel phoneNumberLabel = new JLabel("Phone number");
     private JTextField phoneNumberTextField = new JTextField(20);
     private JPanel namePanel = new JPanel();
-    private final JLabel ticketAmountLabel = new JLabel("Select ticket amount");
-    private final String[] ticketCount = {"1", "2", "3", "4", "5"};
+    private JLabel ticketAmountLabel = new JLabel("Select ticket amount");
+    private String[] ticketCount = {"1", "2", "3", "4", "5"};
     private JComboBox ticketAmountBox = new JComboBox(ticketCount);
-    private final JLabel dateTimeLabel = new JLabel("Date and time");
+    private JLabel dateTimeLabel = new JLabel("Date and time");
     private JTextField dateTimeTextField = new JTextField(20);
     private LocalDateTime currentTime = LocalDateTime.now();
     private DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -37,15 +37,23 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
     private Database db = Database.getInstance();
 
     public ReservationPane() {
-        getReservationsData();
-        data = getTableData();
+
         this.setLayout(new GridLayout(2, 1));
+
+        dateTimeTextField = new JTextField(formattedDate);
+        ticketAmountBox.setPreferredSize(new Dimension(50, 25));
+
         phoneNumberTextField.addKeyListener(this);
         addReservationButton.addActionListener(this);
-        dateTimeTextField = new JTextField(formattedDate);
+
         namePanel.setLayout(new GridBagLayout());
         namePanel.setBorder(BorderFactory.createTitledBorder("Reservation information"));
-        ticketAmountBox.setPreferredSize(new Dimension(50, 25));
+
+        getReservationsData();
+        data = getTableData();
+        model = new DefaultTableModel(data, columnNames);
+        reservationTable = new JTable(model);
+
         namePanel.add(firstNameLabel, createGridBagConstraints(0, 0));
         namePanel.add(firstNameTextField, createGridBagConstraints(1, 0));
         namePanel.add(lastNameLabel, createGridBagConstraints(0, 1));
@@ -57,10 +65,10 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
         namePanel.add(dateTimeLabel, createGridBagConstraints(0, 4));
         namePanel.add(dateTimeTextField, createGridBagConstraints(1, 4));
         namePanel.add(addReservationButton, createGridBagConstraints(1, 5));
+
         this.add(namePanel);
-        model = new DefaultTableModel(data, columnNames);
-        reservationTable = new JTable(model);
         this.add(new JScrollPane(reservationTable));
+
         reservationTable.removeColumn(reservationTable.getColumnModel().getColumn(0));
     }
 
@@ -88,7 +96,7 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
             String insertquery = "SELECT * FROM `reservations`";
             ResultSet result = db.getStatement().executeQuery(insertquery);
             while (result.next()) {
-                reservation = new Reservation(Integer.parseInt(result.getString(1)), result.getString(2), Integer.parseInt(result.getString(3)), Integer.parseInt(result.getString(4)), result.getString(5));
+                reservation = new Reservation(Integer.parseInt(result.getString(1)), result.getString(2), result.getString(3), Integer.parseInt(result.getString(4)), result.getString(5));
                 reservationStoring.add(reservation);
             }
         } catch (SQLException ex) {
@@ -96,7 +104,7 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
         }
     }
 
-    public void insertIntoReservationsTable(String name, int phoneNumber, int numberOfTickets, String dateTimes) {
+    public void insertIntoReservationsTable(String name, String phoneNumber, int numberOfTickets, String dateTimes) {
         String query = "INSERT INTO `reservations` (`Name`, `Phone number`, `Number of tickets`, `Date and time`) VALUES ('"
                 + name + "', '" + phoneNumber + "', '" + numberOfTickets + "', '" + dateTimes + "')";
         try {
@@ -115,13 +123,12 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
                     && phoneNumberTextField.getText().length() == 10
                     && !dateTimeTextField.getText().isEmpty()) {
                 String name = lastNameTextField.getText() + " " + firstNameTextField.getText();
-                System.out.println(name);
-                insertIntoReservationsTable(name, Integer.parseInt(phoneNumberTextField.getText()), Integer.parseInt(ticketAmountBox.getSelectedItem().toString()), dateTimeTextField.getText());
+                insertIntoReservationsTable(name, phoneNumberTextField.getText(), Integer.parseInt(ticketAmountBox.getSelectedItem().toString()), dateTimeTextField.getText());
                 getReservationsData();
                 data = getTableData();
                 model.setDataVector(data, columnNames);
                 reservationTable.removeColumn(reservationTable.getColumnModel().getColumn(0));
-            } else if (phoneNumberTextField.getText().length() < 10
+            } else if (phoneNumberTextField.getText().length() <= 10
                     && phoneNumberTextField.getText().length() >= 1
                     && !firstNameTextField.getText().isEmpty()
                     && !lastNameTextField.getText().isEmpty()

@@ -7,14 +7,14 @@ import javax.swing.table.DefaultTableModel;
 
 public class DataAddingFrame2 extends JFrame implements ActionListener {
 
-    private final JLabel typeLabel = new JLabel("Ticket type");
+    private JLabel typeLabel = new JLabel("Ticket type");
     private JTextField typeField = new JTextField(20);
-    private final JLabel descriptionLabel = new JLabel("Ticket description");
+    private JLabel descriptionLabel = new JLabel("Ticket description");
     private JTextField descriptionField = new JTextField(20);
-    private final JLabel priceLabel = new JLabel("Ticket price");
+    private JLabel priceLabel = new JLabel("Ticket price");
     private JTextField priceField = new JTextField(20);
-    private final JButton addDataButton2 = new JButton("Add data");
-    private final JButton closeFrame = new JButton("Close");
+    private JButton addDataButton2 = new JButton("Add data");
+    private JButton closeFrame = new JButton("Close");
     private SellTickets parentPanel;
     private Database db = Database.getInstance();
     private DefaultTableModel model;
@@ -28,31 +28,31 @@ public class DataAddingFrame2 extends JFrame implements ActionListener {
         this.parentPanel = parentPanel;
         setLayout(new GridLayout(4, 2));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
-         addWindowListener(new WindowAdapter() {
-        @Override
-        public void windowClosing(WindowEvent e) {
-            parentPanel.resetFrame();
-        }
-    });
-        
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                parentPanel.resetFrame();
+            }
+        });
+
         add(typeLabel);
         add(typeField);
         add(descriptionLabel);
         add(descriptionField);
         add(priceLabel);
         add(priceField);
-        
+
         addDataButton2.addActionListener(this);
         closeFrame.addActionListener(this);
-        
+
         add(addDataButton2);
         add(closeFrame);
-        
+
         setSize(800, 300);
         setVisible(true);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addDataButton2) {

@@ -42,6 +42,7 @@ public class SellTickets extends JPanel implements ActionListener {
     private JButton deleteDataButton = new JButton("Delete data");
     private JComboBox comboBoxPayment = new JComboBox(paymentOptions);
     private JLabel cartTotalItems = new JLabel("Number of tickets: " + orderItemCount + " (group sale not applied)");
+    private JLabel totalCostLabel = new JLabel("Price:" + totalCost);
     private JButton addTicketsButton = new JButton("Add to order");
     private JButton deleteTicketsButton = new JButton("Delete items");
     private JButton placeOrderButton = new JButton("Place order");
@@ -55,8 +56,10 @@ public class SellTickets extends JPanel implements ActionListener {
 
     public SellTickets() {
 
+        //Panel layout.
         this.setLayout(new BorderLayout());
 
+        //Setting commands for buttons.
         hour1.setActionCommand("9-17");
         hour2.setActionCommand("17-20");
         student.setActionCommand("student");
@@ -64,6 +67,7 @@ public class SellTickets extends JPanel implements ActionListener {
         veteran.setActionCommand("veteran");
         noDiscount.setActionCommand("no discount");
 
+        //Adding buttons to their respective groups.
         hourGroup.add(hour1);
         hourGroup.add(hour2);
         discountGroup.add(student);
@@ -71,20 +75,25 @@ public class SellTickets extends JPanel implements ActionListener {
         discountGroup.add(veteran);
         discountGroup.add(noDiscount);
 
+        //Creating the table with ticket types and populating it.
         getTicketTypeData();
         data = getTableData();
         ticketTableModel = new DefaultTableModel(data, columnNames);
         ticketTable = new JTable(ticketTableModel);
         ticketTable.getTableHeader().setReorderingAllowed(false);
+
+        //Creating the table which holds the order items.
         orderTableModel = new DefaultTableModel(data2, columnNames2);
         orderTable = new JTable(orderTableModel);
 
+        //Adding action listeners to buttons.
         addDataButton.addActionListener(this);
         deleteDataButton.addActionListener(this);
         addTicketsButton.addActionListener(this);
         deleteTicketsButton.addActionListener(this);
         placeOrderButton.addActionListener(this);
 
+        //Creating the panel which holds the order customisation options.
         JPanel orderSpecifications = new JPanel();
         orderSpecifications.setLayout(new GridBagLayout());
         orderSpecifications.add(ticketCountLabel, createGridBagConstraints(0, 0));
@@ -100,29 +109,38 @@ public class SellTickets extends JPanel implements ActionListener {
         orderSpecifications.add(videoTaxLabel, createGridBagConstraints(0, 5));
         orderSpecifications.add(comboBoxVideo, createGridBagConstraints(1, 5));
 
+        //Creating the panel which holds the ticket types and the add/delete data buttons.
         JPanel ticketSelection = new JPanel();
-        JPanel ticketButtons = new JPanel();
         ticketSelection.setBorder(BorderFactory.createTitledBorder("Ticket options"));
         ticketSelection.setLayout(new BorderLayout());
-        ticketButtons.setLayout(new GridLayout(1, 2));
         ticketSelection.add(new JScrollPane(ticketTable), BorderLayout.NORTH);
-        ticketButtons.add(addDataButton);
-        ticketButtons.add(deleteDataButton);
-        ticketSelection.add(ticketButtons, BorderLayout.SOUTH);
 
+        JPanel ticketTableButtons = new JPanel();
+        ticketTableButtons.setLayout(new GridLayout(1, 2));
+        ticketTableButtons.add(addDataButton);
+        ticketTableButtons.add(deleteDataButton);
+
+        ticketSelection.add(ticketTableButtons, BorderLayout.SOUTH);
+
+        //Creating the panel which holds the order items table other details about 
+        //the price/nr of items + buttons.
         JPanel orderPlacement = new JPanel();
-        JPanel orderPlacementButtons = new JPanel();
         orderPlacement.setBorder(BorderFactory.createTitledBorder("Cart"));
         orderPlacement.setLayout(new BorderLayout());
-        orderPlacementButtons.setLayout(new GridLayout(5, 1));
         orderPlacement.add(new JScrollPane(orderTable), BorderLayout.CENTER);
+
+        JPanel orderPlacementButtons = new JPanel();
+        orderPlacementButtons.setLayout(new GridLayout(6, 1));
         orderPlacementButtons.add(addTicketsButton);
-        orderPlacementButtons.add(comboBoxPayment);
-        orderPlacementButtons.add(cartTotalItems);
-        orderPlacementButtons.add(placeOrderButton);
         orderPlacementButtons.add(deleteTicketsButton);
+        orderPlacementButtons.add(cartTotalItems);
+        orderPlacementButtons.add(totalCostLabel);
+        orderPlacementButtons.add(comboBoxPayment);
+        orderPlacementButtons.add(placeOrderButton);
+
         orderPlacement.add(orderPlacementButtons, BorderLayout.SOUTH);
 
+        //Adding the panels with the tables in a panel for more customization.
         JPanel tables = new JPanel();
         tables.setLayout(new GridLayout(1, 2));
         tables.add(ticketSelection);
@@ -130,10 +148,8 @@ public class SellTickets extends JPanel implements ActionListener {
 
         this.add(orderSpecifications, BorderLayout.NORTH);
         this.add(tables, BorderLayout.CENTER);
-        /*this.add(comboBoxPayment);
-        this.add(cartTotalItems);
-        this.add(placeOrderButton);
-         */
+
+        //Removing the ID column from the tickets table.
         ticketTable.removeColumn(ticketTable.getColumnModel().getColumn(0));
     }
 
@@ -180,7 +196,7 @@ public class SellTickets extends JPanel implements ActionListener {
             System.out.println(e.getMessage() + " - Error inserting data");
         }
     }
-    
+
     public void insertInOrdersTable(int ticketsSold, double totalPrice, String groupDiscount, String paymentType) {
         String query = "INSERT INTO `orders` (`Tickets sold`, `Total price`, `Group discount`, `Payment type`) VALUES ('"
                 + ticketsSold + "', '" + totalPrice + "', '" + groupDiscount + "', '" + paymentType + "')";
@@ -205,8 +221,8 @@ public class SellTickets extends JPanel implements ActionListener {
             System.out.println("Problem To Show Data");
         }
     }
-    
-     public void deleteFromTicketTypeTable(int id) {
+
+    public void deleteFromTicketTypeTable(int id) {
         String query = "DELETE FROM `ticket type` WHERE "
                 + "`ID` = " + id;
         try {
@@ -273,14 +289,6 @@ public class SellTickets extends JPanel implements ActionListener {
                     for (int i = 0; i < orderLength; i++) {
                         double price = orderStoring.get(i).getPrice();
                         orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
-                        totalCost = totalCost + orderStoring.get(i).getPrice();
-                    }
-                } else if (initialOrderSize >= 10) {
-                    int orderLength = orderStoring.size();
-                    for (int i = orderLength - 1; i >= initialOrderSize; i--) {
-                        double price = orderStoring.get(i).getPrice();
-                        orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
-                        totalCost = totalCost + orderStoring.get(i).getPrice();
                     }
                 }
                 data2 = getTableData2();
@@ -288,6 +296,11 @@ public class SellTickets extends JPanel implements ActionListener {
                 if (orderStoring.size() >= 10) {
                     cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
                 }
+                totalCost = 0;
+                for (int i = 0; i < orderItemCount; i++) {
+                    totalCost = totalCost + orderStoring.get(i).getPrice();
+                }
+                totalCostLabel.setText("Price: " + totalCost);
             }
         } else if (e.getSource() == deleteTicketsButton) {
             int[] selection = orderTable.getSelectedRows();
@@ -306,21 +319,19 @@ public class SellTickets extends JPanel implements ActionListener {
                         for (int i = 0; i < orderItemCount; i++) {
                             double price = orderStoring.get(i).getPrice();
                             orderStoring.get(i).setPrice(price / (0.9));
-                            totalCost = totalCost - orderStoring.get(i).getPrice();
                         }
                     } else if (orderItemCount < 10 && !cartTotalItems.getText().contains("group sale applied")) {
                         cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
-                        for (int i = 0; i < orderItemCount; i++) {
-                            totalCost = totalCost - orderStoring.get(i).getPrice();
-                        }
                     } else if (orderItemCount >= 10) {
                         cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
-                        for (int i = 0; i < orderItemCount; i++) {
-                            totalCost = totalCost - orderStoring.get(i).getPrice();
-                        }
                     }
                     data2 = getTableData2();
                     orderTableModel.setDataVector(data2, columnNames2);
+                    totalCost = 0;
+                    for (int i = 0; i < orderItemCount; i++) {
+                        totalCost = totalCost + orderStoring.get(i).getPrice();
+                    }
+                    totalCostLabel.setText("Price: " + totalCost);
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please select a row to delete.");
