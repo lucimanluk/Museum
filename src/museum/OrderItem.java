@@ -10,11 +10,7 @@ import java.util.ArrayList;
 
 public class OrderItem {
 
-    private String timePeriod;
-    private String discountType;
-    private String ticketType;
-    private String photoTax;
-    private String videoTax;
+    private String timePeriod, discountType, ticketType, photoTax, videoTax;
     private double price;
 
     public OrderItem(String timePeriod, String discountType, String ticketType, String photoTax, String videoTax, double price) {

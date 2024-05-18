@@ -4,6 +4,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SellTickets extends JPanel implements ActionListener {
@@ -45,7 +47,9 @@ public class SellTickets extends JPanel implements ActionListener {
     private JButton placeOrderButton = new JButton("Place order");
     private DataAddingFrame2 frame;
 
+    private Ticket ticket;
     private OrderItem orderItem;
+    public ArrayList<Ticket> ticketStoring = new ArrayList<Ticket>();
     private ArrayList<OrderItem> orderStoring = new ArrayList<OrderItem>();
     private Database db = Database.getInstance();
 
@@ -67,6 +71,7 @@ public class SellTickets extends JPanel implements ActionListener {
         discountGroup.add(veteran);
         discountGroup.add(noDiscount);
 
+        getTicketTypeData();
         data = getTableData();
         ticketTableModel = new DefaultTableModel(data, columnNames);
         ticketTable = new JTable(ticketTableModel);
@@ -109,28 +114,31 @@ public class SellTickets extends JPanel implements ActionListener {
         JPanel orderPlacementButtons = new JPanel();
         orderPlacement.setBorder(BorderFactory.createTitledBorder("Cart"));
         orderPlacement.setLayout(new BorderLayout());
-        orderPlacementButtons.setLayout(new GridLayout(1, 2));
-        orderPlacement.add(new JScrollPane(orderTable), BorderLayout.NORTH);
+        orderPlacementButtons.setLayout(new GridLayout(5, 1));
+        orderPlacement.add(new JScrollPane(orderTable), BorderLayout.CENTER);
         orderPlacementButtons.add(addTicketsButton);
+        orderPlacementButtons.add(comboBoxPayment);
+        orderPlacementButtons.add(cartTotalItems);
+        orderPlacementButtons.add(placeOrderButton);
         orderPlacementButtons.add(deleteTicketsButton);
         orderPlacement.add(orderPlacementButtons, BorderLayout.SOUTH);
-        
+
         JPanel tables = new JPanel();
-        tables.setLayout(new GridLayout(1,2));
+        tables.setLayout(new GridLayout(1, 2));
         tables.add(ticketSelection);
         tables.add(orderPlacement);
-        
+
         this.add(orderSpecifications, BorderLayout.NORTH);
         this.add(tables, BorderLayout.CENTER);
         /*this.add(comboBoxPayment);
         this.add(cartTotalItems);
         this.add(placeOrderButton);
-        */
+         */
         ticketTable.removeColumn(ticketTable.getColumnModel().getColumn(0));
     }
 
     public Object[][] getTableData() {
-        return db.ticketStoring.stream()
+        return ticketStoring.stream()
                 .map(item -> new Object[]{
             item.getId(),
             item.getTicketType(),
@@ -144,6 +152,7 @@ public class SellTickets extends JPanel implements ActionListener {
                 .map(item -> new Object[]{
             item.getTimePeriod(),
             item.getDiscountType(),
+            item.getTicketType(),
             item.getPhotoTax(),
             item.getVideoTax(),
             item.getPrice(),}).toArray(Object[][]::new);
@@ -161,11 +170,58 @@ public class SellTickets extends JPanel implements ActionListener {
         return gbc;
     }
 
+    public void insertInTicketTable(String type, String description, int price) {
+        String query = "INSERT INTO `ticket type` (`Ticket type`, `Description`, `Price`) VALUES ('"
+                + type + "', '" + description + "', " + price + ")";
+        try {
+            db.getStatement().executeUpdate(query);
+            System.out.println("Data inserted successfully");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + " - Error inserting data");
+        }
+    }
+    
+    public void insertInOrdersTable(int ticketsSold, double totalPrice, String groupDiscount, String paymentType) {
+        String query = "INSERT INTO `orders` (`Tickets sold`, `Total price`, `Group discount`, `Payment type`) VALUES ('"
+                + ticketsSold + "', '" + totalPrice + "', '" + groupDiscount + "', '" + paymentType + "')";
+        try {
+            db.getStatement().executeUpdate(query);
+            System.out.println("Data inserted successfully");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + " - Error inserting data");
+        }
+    }
+
+    public void getTicketTypeData() {
+        ticketStoring.clear();
+        try {
+            String insertquery = "SELECT * FROM `ticket type`";
+            ResultSet result = db.getStatement().executeQuery(insertquery);
+            while (result.next()) {
+                ticket = new Ticket(Integer.parseInt(result.getString(1)), result.getString(2), result.getString(3), Double.parseDouble(result.getString(4)));
+                ticketStoring.add(ticket);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem To Show Data");
+        }
+    }
+    
+     public void deleteFromTicketTypeTable(int id) {
+        String query = "DELETE FROM `ticket type` WHERE "
+                + "`ID` = " + id;
+        try {
+            db.getStatement().executeUpdate(query);
+            System.out.println("Data deleted successfully");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + " - Error deleting data");
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addDataButton) {
             if (frame == null) {
-                frame = new DataAddingFrame2(this::getTableData, ticketTableModel, columnNames, ticketTable, this);
+                frame = new DataAddingFrame2(ticketTableModel, columnNames, ticketTable, this);
             }
         } else if (e.getSource() == deleteDataButton) {
             int[] selection = ticketTable.getSelectedRows();
@@ -176,10 +232,10 @@ public class SellTickets extends JPanel implements ActionListener {
                         int viewIndex = selection[i];
                         int modelIndex = ticketTable.convertRowIndexToModel(viewIndex);
                         int idToDelete = Integer.parseInt(ticketTableModel.getValueAt(modelIndex, 0).toString());
-                        db.deleteData2(idToDelete);
+                        deleteFromTicketTypeTable(idToDelete);
                         ticketTableModel.removeRow(modelIndex);
                     }
-                    db.view();
+                    getTicketTypeData();
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please select a row to delete.");
@@ -277,7 +333,7 @@ public class SellTickets extends JPanel implements ActionListener {
                     if (orderItemCount >= 10) {
                         groupDiscountValidation = "Yes";
                     }
-                    db.insertData4(orderItemCount, totalCost, groupDiscountValidation, String.valueOf(comboBoxPayment.getSelectedItem()));
+                    insertInOrdersTable(orderItemCount, totalCost, groupDiscountValidation, String.valueOf(comboBoxPayment.getSelectedItem()));
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please place items into the cart.");

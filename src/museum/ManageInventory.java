@@ -4,6 +4,9 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,9 +20,12 @@ public class ManageInventory extends JPanel implements ActionListener {
     private DataAddingFrame frame;
     private Object[][] data;
     private final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
+    private Item item;
+    public ArrayList<Item> itemStoring = new ArrayList<Item>();
     private Database db = Database.getInstance();
 
     public ManageInventory() {
+        getExhibitionItemsData();
         data = getTableData();
         model = new DefaultTableModel(data, columnNames);
         tabelManagementInvetory = new JTable(model);
@@ -34,7 +40,7 @@ public class ManageInventory extends JPanel implements ActionListener {
     }
 
     public Object[][] getTableData() {
-        return db.itemStoring.stream()
+        return itemStoring.stream()
             .map(item -> new Object[] {
                 item.getId(),
                 item.getName(),
@@ -46,11 +52,46 @@ public class ManageInventory extends JPanel implements ActionListener {
             .toArray(Object[][]::new);
     }
 
+    public void insertIntoExhibitionTable(String name, String description, String region, int year, int room) {
+        String query = "INSERT INTO `exhibition items` (`Name`, `Description`, `Region of origin`, `Year of production`, `Room placement`) VALUES ('" + name + "', '" + description + "', '" + region + "', " + year + ", " + room + ")";
+        try {
+            db.getStatement().executeUpdate(query);
+            System.out.println("Data inserted successfully");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + " - Error inserting data");
+        }
+    }
+    
+     public void deleteFromExhibitionItemsTable(int id) {
+        String query = "DELETE FROM `exhibition items` WHERE "
+                + "`ID` = " + id;
+        try {
+            db.getStatement().executeUpdate(query);
+            System.out.println("Data deleted successfully");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + " - Error deleting data");
+        }
+    }
+     
+     public void getExhibitionItemsData() {
+        itemStoring.clear();
+        try {
+            String insertquery = "SELECT * FROM `exhibition items`";
+            ResultSet result = db.getStatement().executeQuery(insertquery);
+            while (result.next()) {
+                item = new Item(Integer.parseInt(result.getString(1)), result.getString(2), result.getString(3), result.getString(4), Integer.parseInt(result.getString(5)), Integer.parseInt(result.getString(6)));
+                itemStoring.add(item);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem To Show Data");
+        }
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == addDataButton) {
-            frame = new DataAddingFrame(db, this::getTableData, model, columnNames, tabelManagementInvetory);
+            frame = new DataAddingFrame(model, columnNames, tabelManagementInvetory, this);
         } else if (e.getSource() == deleteDataButton) {
             int[] selection = tabelManagementInvetory.getSelectedRows();
             if (selection.length > 0) {
@@ -60,10 +101,10 @@ public class ManageInventory extends JPanel implements ActionListener {
                         int viewIndex = selection[i];
                         int modelIndex = tabelManagementInvetory.convertRowIndexToModel(viewIndex);
                         int idToDelete = Integer.parseInt(model.getValueAt(modelIndex, 0).toString());
-                        db.deleteData(idToDelete);
+                        deleteFromExhibitionItemsTable(idToDelete);
                         model.removeRow(modelIndex);
                     }
-                    db.view2();
+                    getExhibitionItemsData();
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please select a row to delete.");

@@ -7,27 +7,27 @@ import javax.swing.table.DefaultTableModel;
 
 public class DataAddingFrame extends JFrame implements ActionListener {
 
-    private final JLabel nameLabel = new JLabel("Name");
+    private JLabel nameLabel = new JLabel("Name");
     private JTextField nameField = new JTextField(20);
-    private final JLabel descriptionLabel = new JLabel("Description");
+    private JLabel descriptionLabel = new JLabel("Description");
     private JTextField descriptionField = new JTextField(20);
-    private final JLabel regionLabel = new JLabel("Region of origin");
+    private JLabel regionLabel = new JLabel("Region of origin");
     private JTextField regionField = new JTextField(20);
-    private final JLabel yearLabel = new JLabel("Year of production");
+    private JLabel yearLabel = new JLabel("Year of production");
     private JTextField yearField = new JTextField(20);
-    private final JLabel roomLabel = new JLabel("Room placement");
+    private JLabel roomLabel = new JLabel("Room placement");
     private JTextField roomField = new JTextField(20);
-    private final JButton addDataButton2 = new JButton("Add data");
-    private final JButton closeFrame = new JButton("Close");
-    private TableDataFetcher dataFetcher;
+    private JButton addDataButton2 = new JButton("Add data");
+    private JButton closeFrame = new JButton("Close");
     private DefaultTableModel model;
     private String[] columnNames;
     private JTable tabelManagementInventory;
-    private Database db;
+    private ManageInventory parentPanel;
+    private Database db = Database.getInstance();
 
-    public DataAddingFrame(Database db, TableDataFetcher dataFetcher, DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory) {
-        this.db = db;
-        this.dataFetcher = dataFetcher;
+    public DataAddingFrame(DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory, ManageInventory parentPanel) {
+        
+        this.parentPanel = parentPanel;
         this.model = model;
         this.columnNames = columnNames;
         this.tabelManagementInventory = tabelManagementInventory;
@@ -62,9 +62,9 @@ public class DataAddingFrame extends JFrame implements ActionListener {
                     && !regionField.getText().isEmpty()
                     && !yearField.getText().isEmpty()
                     && !roomField.getText().isEmpty()) {
-                db.insertData(nameField.getText(), descriptionField.getText(), regionField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(roomField.getText()));
-                db.view2();
-                Object[][] newData = dataFetcher.fetchTableData();
+                parentPanel.insertIntoExhibitionTable(nameField.getText(), descriptionField.getText(), regionField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(roomField.getText()));
+                parentPanel.getExhibitionItemsData();
+                Object[][] newData = parentPanel.getTableData();
                 model.setDataVector(newData, columnNames);
                 tabelManagementInventory.removeColumn(tabelManagementInventory.getColumnModel().getColumn(0));
             }

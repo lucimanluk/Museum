@@ -17,13 +17,11 @@ public class DataAddingFrame2 extends JFrame implements ActionListener {
     private final JButton closeFrame = new JButton("Close");
     private SellTickets parentPanel;
     private Database db = Database.getInstance();
-    private TableDataFetcher dataFetcher;
     private DefaultTableModel model;
     private String[] columnNames;
     private JTable tabelManagementInventory;
 
-    public DataAddingFrame2(TableDataFetcher dataFetcher, DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory, SellTickets parentPanel) {
-        this.dataFetcher = dataFetcher;
+    public DataAddingFrame2(DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory, SellTickets parentPanel) {
         this.model = model;
         this.columnNames = columnNames;
         this.tabelManagementInventory = tabelManagementInventory;
@@ -61,9 +59,9 @@ public class DataAddingFrame2 extends JFrame implements ActionListener {
             if (!typeField.getText().isEmpty()
                     && !descriptionField.getText().isEmpty()
                     && !priceField.getText().isEmpty()) {
-                db.insertData2(typeField.getText(), descriptionField.getText(), Integer.parseInt(priceField.getText()));
-                db.view();
-                Object[][] newData = dataFetcher.fetchTableData();
+                parentPanel.insertInTicketTable(typeField.getText(), descriptionField.getText(), Integer.parseInt(priceField.getText()));
+                parentPanel.getTicketTypeData();
+                Object[][] newData = parentPanel.getTableData();
                 model.setDataVector(newData, columnNames);
                 tabelManagementInventory.removeColumn(tabelManagementInventory.getColumnModel().getColumn(0));
             }

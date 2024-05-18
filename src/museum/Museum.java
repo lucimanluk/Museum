@@ -9,10 +9,6 @@ public class Museum {
     public Database db = Database.getInstance();
 
     public Museum() {
-        db.view();
-        db.view2();
-        db.view3();
-        db.view4();
         SellTickets se1lTicketsPage = new SellTickets();
         ReservationPane reservationPage = new ReservationPane();
         ManageInventory managePage = new ManageInventory();

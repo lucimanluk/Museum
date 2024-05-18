@@ -3,6 +3,8 @@ package museum;
 import java.awt.event.*;
 import javax.swing.*;
 import java.awt.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
@@ -28,13 +30,16 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
     private final JButton addReservationButton = new JButton("Add reservation");
     private Object[][] data;
     private final String[] columnNames = {"Id", "Name", "Phone number", "Number of tickets", "Date and time"};
+    private Reservation reservation;
+    private ArrayList<Reservation> reservationStoring = new ArrayList<Reservation>();
     private DefaultTableModel model;
     private JTable reservationTable;
     private Database db = Database.getInstance();
 
     public ReservationPane() {
+        getReservationsData();
         data = getTableData();
-        this.setLayout(new GridLayout(2,1));
+        this.setLayout(new GridLayout(2, 1));
         phoneNumberTextField.addKeyListener(this);
         addReservationButton.addActionListener(this);
         dateTimeTextField = new JTextField(formattedDate);
@@ -67,16 +72,39 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
         return gbc;
     }
 
-    
     public Object[][] getTableData() {
-        return db.reservationStoring.stream()
-                .map(item -> new Object[]{
+        return reservationStoring.stream().map(item -> new Object[]{
             item.getId(),
             item.getName(),
             item.getPhoneNumber(),
             item.getNumberOfTickets(),
             item.getDateTime()
         }).toArray(Object[][]::new);
+    }
+
+    public void getReservationsData() {
+        reservationStoring.clear();
+        try {
+            String insertquery = "SELECT * FROM `reservations`";
+            ResultSet result = db.getStatement().executeQuery(insertquery);
+            while (result.next()) {
+                reservation = new Reservation(Integer.parseInt(result.getString(1)), result.getString(2), Integer.parseInt(result.getString(3)), Integer.parseInt(result.getString(4)), result.getString(5));
+                reservationStoring.add(reservation);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem To Show Data");
+        }
+    }
+
+    public void insertIntoReservationsTable(String name, int phoneNumber, int numberOfTickets, String dateTimes) {
+        String query = "INSERT INTO `reservations` (`Name`, `Phone number`, `Number of tickets`, `Date and time`) VALUES ('"
+                + name + "', '" + phoneNumber + "', '" + numberOfTickets + "', '" + dateTimes + "')";
+        try {
+            db.getStatement().executeUpdate(query);
+            System.out.println("Data inserted successfully");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + " - Error inserting data");
+        }
     }
 
     @Override
@@ -88,8 +116,8 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
                     && !dateTimeTextField.getText().isEmpty()) {
                 String name = lastNameTextField.getText() + " " + firstNameTextField.getText();
                 System.out.println(name);
-                db.insertData3(name, Integer.parseInt(phoneNumberTextField.getText()), Integer.parseInt(ticketAmountBox.getSelectedItem().toString()), dateTimeTextField.getText());
-                db.view3();
+                insertIntoReservationsTable(name, Integer.parseInt(phoneNumberTextField.getText()), Integer.parseInt(ticketAmountBox.getSelectedItem().toString()), dateTimeTextField.getText());
+                getReservationsData();
                 data = getTableData();
                 model.setDataVector(data, columnNames);
                 reservationTable.removeColumn(reservationTable.getColumnModel().getColumn(0));
