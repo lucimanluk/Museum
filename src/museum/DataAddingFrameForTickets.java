@@ -5,7 +5,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.table.DefaultTableModel;
 
-public class DataAddingFrame2 extends JFrame implements ActionListener {
+public class DataAddingFrameForTickets extends JFrame implements ActionListener {
 
     private JLabel typeLabel = new JLabel("Ticket type");
     private JTextField typeField = new JTextField(20);
@@ -17,14 +17,8 @@ public class DataAddingFrame2 extends JFrame implements ActionListener {
     private JButton closeFrame = new JButton("Close");
     private SellTickets parentPanel;
     private Database db = Database.getInstance();
-    private DefaultTableModel model;
-    private String[] columnNames;
-    private JTable tabelManagementInventory;
 
-    public DataAddingFrame2(DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory, SellTickets parentPanel) {
-        this.model = model;
-        this.columnNames = columnNames;
-        this.tabelManagementInventory = tabelManagementInventory;
+    public DataAddingFrameForTickets(SellTickets parentPanel) {
         this.parentPanel = parentPanel;
         setLayout(new GridLayout(4, 2));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -60,10 +54,7 @@ public class DataAddingFrame2 extends JFrame implements ActionListener {
                     && !descriptionField.getText().isEmpty()
                     && !priceField.getText().isEmpty()) {
                 parentPanel.insertInTicketTable(typeField.getText(), descriptionField.getText(), Integer.parseInt(priceField.getText()));
-                parentPanel.getTicketTypeData();
-                Object[][] newData = parentPanel.getTableData();
-                model.setDataVector(newData, columnNames);
-                tabelManagementInventory.removeColumn(tabelManagementInventory.getColumnModel().getColumn(0));
+                parentPanel.refreshTableData();
             }
         } else if (e.getSource() == closeFrame) {
             dispose();

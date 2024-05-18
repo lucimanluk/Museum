@@ -14,36 +14,36 @@ import java.util.stream.Stream;
 public class ManageInventory extends JPanel implements ActionListener {
 
     private static final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
-    
+
     private Object[][] data;
-    
+
     private JTable tabelManagementInvetory;
     private DefaultTableModel model;
     private JButton addDataButton = new JButton("Add data");
     private JButton deleteDataButton = new JButton("Delete data");
-    private DataAddingFrame frame;
-    
+    private DataAddingFrameForInventory frame;
+
     private Item item;
     public ArrayList<Item> itemStoring = new ArrayList<Item>();
     private Database db = Database.getInstance();
 
     public ManageInventory() {
-        
+
         this.setLayout(new FlowLayout());
-        
+
         getExhibitionItemsData();
         data = getTableData();
         model = new DefaultTableModel(data, columnNames);
         tabelManagementInvetory = new JTable(model);
         tabelManagementInvetory.getTableHeader().setReorderingAllowed(false);
         this.add(new JScrollPane(tabelManagementInvetory));
-        
+
         addDataButton.addActionListener(this);
         deleteDataButton.addActionListener(this);
-        
+
         this.add(addDataButton);
         this.add(deleteDataButton);
-        
+
         tabelManagementInvetory.removeColumn(tabelManagementInvetory.getColumnModel().getColumn(0));
     }
 
@@ -95,11 +95,18 @@ public class ManageInventory extends JPanel implements ActionListener {
         }
     }
 
+    public void RefreshTableData() {
+        getExhibitionItemsData();
+        Object[][] newData = getTableData();
+        model.setDataVector(newData, columnNames);
+        tabelManagementInvetory.removeColumn(tabelManagementInvetory.getColumnModel().getColumn(0));
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == addDataButton) {
-            frame = new DataAddingFrame(model, columnNames, tabelManagementInvetory, this);
+            frame = new DataAddingFrameForInventory(this);
         } else if (e.getSource() == deleteDataButton) {
             int[] selection = tabelManagementInvetory.getSelectedRows();
             if (selection.length > 0) {

@@ -46,7 +46,7 @@ public class SellTickets extends JPanel implements ActionListener {
     private JButton addTicketsButton = new JButton("Add to order");
     private JButton deleteTicketsButton = new JButton("Delete items");
     private JButton placeOrderButton = new JButton("Place order");
-    private DataAddingFrame2 frame;
+    private DataAddingFrameForTickets frame;
 
     private Ticket ticket;
     private OrderItem orderItem;
@@ -233,11 +233,18 @@ public class SellTickets extends JPanel implements ActionListener {
         }
     }
 
+    public void refreshTableData() {
+        getTicketTypeData();
+        Object[][] newData = getTableData();
+        ticketTableModel.setDataVector(newData, columnNames);
+        ticketTable.removeColumn(ticketTable.getColumnModel().getColumn(0));
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addDataButton) {
             if (frame == null) {
-                frame = new DataAddingFrame2(ticketTableModel, columnNames, ticketTable, this);
+                frame = new DataAddingFrameForTickets(this);
             }
         } else if (e.getSource() == deleteDataButton) {
             int[] selection = ticketTable.getSelectedRows();

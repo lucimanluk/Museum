@@ -12,6 +12,13 @@ import javax.swing.table.DefaultTableModel;
 
 public class ReservationPane extends JPanel implements KeyListener, ActionListener {
 
+    private static final String[] columnNames = {"Id", "Name", "Phone number", "Number of tickets", "Date and time"};
+    
+    private Object[][] data;
+    private LocalDateTime currentTime = LocalDateTime.now();
+    private DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private String formattedDate = currentTime.format(myFormatObj);
+    
     private JLabel firstNameLabel = new JLabel("First name");
     private JTextField firstNameTextField = new JTextField(20);
     private JLabel lastNameLabel = new JLabel("Last name");
@@ -24,16 +31,12 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
     private JComboBox ticketAmountBox = new JComboBox(ticketCount);
     private JLabel dateTimeLabel = new JLabel("Date and time");
     private JTextField dateTimeTextField = new JTextField(20);
-    private LocalDateTime currentTime = LocalDateTime.now();
-    private DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-    private String formattedDate = currentTime.format(myFormatObj);
-    private final JButton addReservationButton = new JButton("Add reservation");
-    private Object[][] data;
-    private final String[] columnNames = {"Id", "Name", "Phone number", "Number of tickets", "Date and time"};
-    private Reservation reservation;
-    private ArrayList<Reservation> reservationStoring = new ArrayList<Reservation>();
+    private JButton addReservationButton = new JButton("Add reservation");
     private DefaultTableModel model;
     private JTable reservationTable;
+    
+    private Reservation reservation;
+    private ArrayList<Reservation> reservationStoring = new ArrayList<Reservation>();
     private Database db = Database.getInstance();
 
     public ReservationPane() {

@@ -6,14 +6,14 @@ public class Museum {
 
     private final JFrame initialFrame = new JFrame("EMuseum");
     private final JTabbedPane tabbedPane = new JTabbedPane();
+
+    SellTickets se1lTicketsPage = new SellTickets();
+    ReservationPane reservationPage = new ReservationPane();
+    ManageInventory managePage = new ManageInventory();
+    SoldTickets SoldTicketsPage = new SoldTickets();
     public Database db = Database.getInstance();
 
     public Museum() {
-        SellTickets se1lTicketsPage = new SellTickets();
-        ReservationPane reservationPage = new ReservationPane();
-        ManageInventory managePage = new ManageInventory();
-        SoldTickets SoldTicketsPage = new SoldTickets();
-
         tabbedPane.addTab("Sell tickets", se1lTicketsPage);
         tabbedPane.addTab("Reserve tickets", reservationPage);
         tabbedPane.addTab("Manage inventory", managePage);

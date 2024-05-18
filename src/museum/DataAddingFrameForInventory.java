@@ -5,7 +5,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.table.DefaultTableModel;
 
-public class DataAddingFrame extends JFrame implements ActionListener {
+public class DataAddingFrameForInventory extends JFrame implements ActionListener {
 
     private JLabel nameLabel = new JLabel("Name");
     private JTextField nameField = new JTextField(20);
@@ -19,18 +19,12 @@ public class DataAddingFrame extends JFrame implements ActionListener {
     private JTextField roomField = new JTextField(20);
     private JButton addDataButton2 = new JButton("Add data");
     private JButton closeFrame = new JButton("Close");
-    private DefaultTableModel model;
-    private String[] columnNames;
-    private JTable tabelManagementInventory;
     private ManageInventory parentPanel;
     private Database db = Database.getInstance();
 
-    public DataAddingFrame(DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory, ManageInventory parentPanel) {
+    public DataAddingFrameForInventory(ManageInventory parentPanel) {
         
         this.parentPanel = parentPanel;
-        this.model = model;
-        this.columnNames = columnNames;
-        this.tabelManagementInventory = tabelManagementInventory;
         setLayout(new GridLayout(6, 2));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -63,10 +57,7 @@ public class DataAddingFrame extends JFrame implements ActionListener {
                     && !yearField.getText().isEmpty()
                     && !roomField.getText().isEmpty()) {
                 parentPanel.insertIntoExhibitionTable(nameField.getText(), descriptionField.getText(), regionField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(roomField.getText()));
-                parentPanel.getExhibitionItemsData();
-                Object[][] newData = parentPanel.getTableData();
-                model.setDataVector(newData, columnNames);
-                tabelManagementInventory.removeColumn(tabelManagementInventory.getColumnModel().getColumn(0));
+                parentPanel.RefreshTableData();
             }
         } else if (e.getSource() == closeFrame) {
             dispose();
