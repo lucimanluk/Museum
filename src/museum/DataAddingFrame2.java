@@ -33,7 +33,7 @@ public class DataAddingFrame2 extends JFrame implements ActionListener {
         this.columnNames = columnNames;
         this.tabelManagementInventory = tabelManagementInventory;
         this.parentPanel = parentPanel;
-        setLayout(new GridLayout(6,2));
+        setLayout(new GridLayout(4, 2));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
          addWindowListener(new WindowAdapter() {

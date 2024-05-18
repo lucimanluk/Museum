@@ -15,8 +15,8 @@ public class ManageInventory extends JPanel implements ActionListener {
     private final JButton addDataButton = new JButton("Add data");
     private final JButton deleteDataButton = new JButton("Delete data");
     private DataAddingFrame frame;
-    public Object[][] data;
-    public final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
+    private Object[][] data;
+    private final String[] columnNames = {"ID", "Name", "Description", "Region of origin", "Year of production", "Room placement"};
     private Database db = Database.getInstance();
 
     public ManageInventory() {

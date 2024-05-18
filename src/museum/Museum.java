@@ -15,12 +15,12 @@ public class Museum {
         SellTickets se1lTicketsPage = new SellTickets();
         ReservationPane reservationPage = new ReservationPane();
         ManageInventory managePage = new ManageInventory();
-        JPanel page4 = new JPanel();
+        SoldTickets SoldTicketsPage = new SoldTickets();
 
         tabbedPane.addTab("Sell tickets", se1lTicketsPage);
         tabbedPane.addTab("Reserve tickets", reservationPage);
         tabbedPane.addTab("Manage inventory", managePage);
-        tabbedPane.addTab("Ticket sales", page4);
+        tabbedPane.addTab("Ticket sales", SoldTicketsPage);
 
         initialFrame.add(tabbedPane);
         initialFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
