@@ -268,7 +268,8 @@ public class SellTickets extends JPanel implements ActionListener {
             int ticketsNumber = Integer.parseInt(ticketCountTextField.getText());
             if (selection.length > 0) {
                 int initialOrderSize = orderStoring.size();
-                orderItemCount = orderItemCount + selection.length * ticketsNumber;
+                int itemsToAdd = selection.length * ticketsNumber;
+                orderItemCount = orderItemCount + itemsToAdd;
                 for (int i = 0; i < selection.length; i++) {
                     for (int j = 0; j < ticketsNumber; j++) {
                         int modelIndex = ticketTable.convertRowIndexToModel(selection[i]);
@@ -291,21 +292,29 @@ public class SellTickets extends JPanel implements ActionListener {
                         orderStoring.add(orderItem = new OrderItem(hourGroup.getSelection().getActionCommand(), discountGroup.getSelection().getActionCommand(), ticketType, String.valueOf(comboBoxPhoto.getSelectedItem()), String.valueOf(comboBoxVideo.getSelectedItem()), price));
                     }
                 }
+                
                 if (initialOrderSize < 10 && orderItemCount >= 10) {
                     int orderLength = orderStoring.size();
                     for (int i = 0; i < orderLength; i++) {
                         double price = orderStoring.get(i).getPrice();
                         orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
                     }
+                } else if (orderStoring.size() >= 10) {
+                    for (int i =  orderStoring.size() - itemsToAdd; i < orderStoring.size(); i++) {
+                        double price = orderStoring.get(i).getPrice();
+                        orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
+                    }
                 }
                 data2 = getTableData2();
                 orderTableModel.setDataVector(data2, columnNames2);
-                if (orderStoring.size() >= 10) {
-                    cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
-                }
                 totalCost = 0;
                 for (int i = 0; i < orderItemCount; i++) {
                     totalCost = totalCost + orderStoring.get(i).getPrice();
+                }
+                if(orderItemCount >= 10) {
+                    cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");                  
+                } else {
+                    cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
                 }
                 totalCostLabel.setText("Price: " + totalCost);
             }
@@ -321,22 +330,23 @@ public class SellTickets extends JPanel implements ActionListener {
                         orderStoring.remove(viewIndex);
                     }
                     orderItemCount = orderTableModel.getRowCount();
-                    if (orderItemCount < 10 && cartTotalItems.getText().contains("group sale applied")) {
-                        cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
+                    if (orderItemCount < 10 && cartTotalItems.getText().contains("group sale applied")) {                       
                         for (int i = 0; i < orderItemCount; i++) {
                             double price = orderStoring.get(i).getPrice();
                             orderStoring.get(i).setPrice(price / (0.9));
                         }
-                    } else if (orderItemCount < 10 && !cartTotalItems.getText().contains("group sale applied")) {
-                        cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
-                    } else if (orderItemCount >= 10) {
-                        cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
                     }
                     data2 = getTableData2();
                     orderTableModel.setDataVector(data2, columnNames2);
                     totalCost = 0;
                     for (int i = 0; i < orderItemCount; i++) {
                         totalCost = totalCost + orderStoring.get(i).getPrice();
+                    }
+                    if (orderItemCount >= 10) {
+                        cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
+                    }
+                    else {
+                        cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
                     }
                     totalCostLabel.setText("Price: " + totalCost);
                 }
