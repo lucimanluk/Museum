@@ -12,9 +12,11 @@ public class Database {
     private Ticket ticket;
     private Item item;
     private Reservation reservation;
+    private Order order;
     public ArrayList<Ticket> ticketStoring = new ArrayList<Ticket>();
     public ArrayList<Item> itemStoring = new ArrayList<Item>();
     public ArrayList<Reservation> reservationStoring = new ArrayList<Reservation>();
+    public ArrayList<Order> orderStoring = new ArrayList<Order>();
 
     private Database() {
         try {
@@ -72,6 +74,17 @@ public class Database {
     public void insertData3(String name, int phoneNumber, int numberOfTickets, String dateTimes) {
         String query = "INSERT INTO `reservations` (`Name`, `Phone number`, `Number of tickets`, `Date and time`) VALUES ('"
                 + name + "', '" + phoneNumber + "', '" + numberOfTickets + "', '" + dateTimes + "')";
+        try {
+            stmt.executeUpdate(query);
+            System.out.println("Data inserted successfully");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + " - Error inserting data");
+        }
+    }
+
+    public void insertData4(int ticketsSold, double totalPrice, String groupDiscount, String paymentType) {
+        String query = "INSERT INTO `orders` (`Tickets sold`, `Total price`, `Group discount`, `Payment type`) VALUES ('"
+                + ticketsSold + "', '" + totalPrice + "', '" + groupDiscount + "', '" + paymentType + "')";
         try {
             stmt.executeUpdate(query);
             System.out.println("Data inserted successfully");
@@ -144,4 +157,17 @@ public class Database {
         }
     }
 
+    public void view4() {
+        orderStoring.clear();
+        try {
+            String insertquery = "SELECT * FROM `orders`";
+            ResultSet result = stmt.executeQuery(insertquery);
+            while (result.next()) {
+                order = new Order(Integer.parseInt(result.getString(1)), Integer.parseInt(result.getString(2)), Double.parseDouble(result.getString(3)), result.getString(4), result.getString(5));
+                orderStoring.add(order);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Problem To Show Data");
+        }
+    }
 }

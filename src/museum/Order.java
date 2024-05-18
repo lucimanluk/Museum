@@ -9,38 +9,37 @@ package museum;
  * @author Florin
  */
 public class Order {
-    private int id;
-    private int ticketsSold;
-    private int totalPrice;
-    private boolean groupDiscount;
-    private String paymentType;
-    
-    public Order(int id, int ticketsSold, int totalPrice, boolean groupDiscount, String paymentType) {
+
+    private int id, ticketsSold;
+    private double totalPrice;
+    private String groupDiscount, paymentType;
+
+    public Order(int id, int ticketsSold, double totalPrice, String groupDiscount, String paymentType) {
         this.id = id;
         this.ticketsSold = ticketsSold;
         this.totalPrice = totalPrice;
         this.groupDiscount = groupDiscount;
         this.paymentType = paymentType;
     }
-    
-    public int id() {
+
+    public int getID() {
         return this.id;
     }
-    
+
     public int getTicketsSold() {
         return this.ticketsSold;
     }
-    
-    public int getTotalPrice() {
+
+    public double getTotalPrice() {
         return this.totalPrice;
-    }    
-    
-    public boolean getGroupDiscount() {
+    }
+
+    public String getGroupDiscount() {
         return this.groupDiscount;
     }
-    
-    public String paymentType() {
+
+    public String getPaymentType() {
         return this.paymentType;
     }
-    
+
 }

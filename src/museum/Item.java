@@ -2,13 +2,9 @@ package museum;
 
 public class Item {
 
-    private int id;
-    private String name;
-    private String description;
-    private String regionOfOrigin;
-    private int year;
-    private int room;
-
+    private int id, year, room;
+    private String name, description, regionOfOrigin;
+    
     public Item(int id, String name, String description, String regionOfOrigin, int year, int room) {
         this.id = id;
         this.name = name;

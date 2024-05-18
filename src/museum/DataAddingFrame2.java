@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package museum;
 
 import java.awt.*;
@@ -20,14 +16,13 @@ public class DataAddingFrame2 extends JFrame implements ActionListener {
     private final JButton addDataButton2 = new JButton("Add data");
     private final JButton closeFrame = new JButton("Close");
     private SellTickets parentPanel;
-    private Database db;
+    private Database db = Database.getInstance();
     private TableDataFetcher dataFetcher;
     private DefaultTableModel model;
     private String[] columnNames;
     private JTable tabelManagementInventory;
 
-    public DataAddingFrame2(Database db, TableDataFetcher dataFetcher, DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory, SellTickets parentPanel) {
-        this.db = db;
+    public DataAddingFrame2(TableDataFetcher dataFetcher, DefaultTableModel model, String[] columnNames, JTable tabelManagementInventory, SellTickets parentPanel) {
         this.dataFetcher = dataFetcher;
         this.model = model;
         this.columnNames = columnNames;

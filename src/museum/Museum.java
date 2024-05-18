@@ -6,12 +6,13 @@ public class Museum {
 
     private final JFrame initialFrame = new JFrame("EMuseum");
     private final JTabbedPane tabbedPane = new JTabbedPane();
-    public Database db =  Database.getInstance();
+    public Database db = Database.getInstance();
 
     public Museum() {
         db.view();
         db.view2();
         db.view3();
+        db.view4();
         SellTickets se1lTicketsPage = new SellTickets();
         ReservationPane reservationPage = new ReservationPane();
         ManageInventory managePage = new ManageInventory();

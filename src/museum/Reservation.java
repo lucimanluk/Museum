@@ -6,11 +6,8 @@ package museum;
 
 public class Reservation {
 
-    private int id;
-    private String name;
-    private int phoneNumber;
-    private int numberOfTickets;
-    private String dateTime;
+    private int id, phoneNumber, numberOfTickets;
+    private String name, dateTime;
 
     public Reservation(int id, String name, int phoneNumber, int numberOfTickets, String dateTime) {
         this.id = id;

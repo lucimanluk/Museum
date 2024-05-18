@@ -76,8 +76,7 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
             item.getPhoneNumber(),
             item.getNumberOfTickets(),
             item.getDateTime()
-        })
-                .toArray(Object[][]::new);
+        }).toArray(Object[][]::new);
     }
 
     @Override

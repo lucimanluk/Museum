@@ -8,92 +8,124 @@ import java.util.ArrayList;
 
 public class SellTickets extends JPanel implements ActionListener {
 
-    private final JLabel ticketCountLabel = new JLabel("Enter number of tickets");
-    private final JLabel photoTaxLabel = new JLabel("Photography tax");
-    private final JLabel videoTaxLabel = new JLabel("Videography tax");
+    private static final String[] columnNames = {"ID", "Ticket type", "Ticket description", "Ticket price"};
+    private static final String[] columnNames2 = {"Time period", "Discount type", "Ticket type", "Photo tax", "Video tax", "Price"};
+    private static final String[] options = {"No", "Yes"};
+    private static final String[] paymentOptions = {"Cash", "Card"};
+
+    private Object[][] data;
+    private Object[][] data2;
+    private int orderItemCount = 0;
+    private double totalCost = 0;
+
+    private JLabel ticketCountLabel = new JLabel("Enter number of tickets");
     private JTextField ticketCountTextField = new JTextField(20);
-    private final JRadioButton hour1 = new JRadioButton("9-17");
-    private final JRadioButton hour2 = new JRadioButton("17-20 (10% higher price)");
-    private final JRadioButton student = new JRadioButton("Student (50% off)");
-    private final JRadioButton retiree = new JRadioButton("Retiree (50% off)");
-    private final JRadioButton veteran = new JRadioButton("Veteran (75% off)");
-    private final JRadioButton noDiscount = new JRadioButton("No discount");
-    private final ButtonGroup hourGroup = new ButtonGroup();
-    private final ButtonGroup discountGroup = new ButtonGroup();
+    private JRadioButton hour1 = new JRadioButton("9-17");
+    private JRadioButton hour2 = new JRadioButton("17-20 (10% higher price)");
+    private ButtonGroup hourGroup = new ButtonGroup();
+    private JRadioButton student = new JRadioButton("Student (50% off)");
+    private JRadioButton retiree = new JRadioButton("Retiree (50% off)");
+    private JRadioButton veteran = new JRadioButton("Veteran (75% off)");
+    private JRadioButton noDiscount = new JRadioButton("No discount");
+    private ButtonGroup discountGroup = new ButtonGroup();
+    private JLabel photoTaxLabel = new JLabel("Photography tax");
+    private JComboBox comboBoxPhoto = new JComboBox(options);
+    private JLabel videoTaxLabel = new JLabel("Videography tax");
+    private JComboBox comboBoxVideo = new JComboBox(options);
     private JTable ticketTable;
     private JTable orderTable;
     private DefaultTableModel ticketTableModel;
     private DefaultTableModel orderTableModel;
-    private final JButton addDataButton = new JButton("Add data");
-    private final JButton deleteDataButton = new JButton("Delete data");
-    private final JButton addTicketsButton = new JButton("Add to order");
-    private final JButton deleteTicketsButton = new JButton("Delete items");
-    private final String[] options = {"No", "Yes"};
-    private final String[] paymentOptions = {"Cash", "Card"};
-    private final JComboBox comboBoxPhoto = new JComboBox(options);
-    private final JComboBox comboBoxVideo = new JComboBox(options);
-    private final JComboBox comboBoxPayment = new JComboBox(paymentOptions);
-    private int orderItemCount = 0;
+    private JButton addDataButton = new JButton("Add data");
+    private JButton deleteDataButton = new JButton("Delete data");
+    private JComboBox comboBoxPayment = new JComboBox(paymentOptions);
     private JLabel cartTotalItems = new JLabel("Number of tickets: " + orderItemCount + " (group sale not applied)");
+    private JButton addTicketsButton = new JButton("Add to order");
+    private JButton deleteTicketsButton = new JButton("Delete items");
     private JButton placeOrderButton = new JButton("Place order");
     private DataAddingFrame2 frame;
-    private Database db = Database.getInstance();
-    private Object[][] data;
-    private Object[][] data2;
+
     private OrderItem orderItem;
     private ArrayList<OrderItem> orderStoring = new ArrayList<OrderItem>();
-    private final String[] columnNames = {"ID", "Ticket type", "Ticket description", "Ticket price"};
-    private final String[] columnNames2 = {"Time period", "Discount type", "Ticket type", "Photo tax", "Video tax", "Price"};
+    private Database db = Database.getInstance();
 
     public SellTickets() {
-        JPanel this1 = new JPanel();
-        this1.setLayout(new GridBagLayout());
-        data = getTableData();
-        ticketTableModel = new DefaultTableModel(data, columnNames);
-        ticketTable = new JTable(ticketTableModel);
-        ticketTable.getTableHeader().setReorderingAllowed(false);
-        orderTableModel = new DefaultTableModel(data2, columnNames2);
-        orderTable = new JTable(orderTableModel);
-        this.setLayout(new FlowLayout());
-        this1.add(ticketCountLabel, createGridBagConstraints(0, 0));
-        this1.add(ticketCountTextField, createGridBagConstraints(1, 0));
+
+        this.setLayout(new BorderLayout());
+
         hour1.setActionCommand("9-17");
         hour2.setActionCommand("17-20");
+        student.setActionCommand("student");
+        retiree.setActionCommand("retiree");
+        veteran.setActionCommand("veteran");
+        noDiscount.setActionCommand("no discount");
+
         hourGroup.add(hour1);
         hourGroup.add(hour2);
         discountGroup.add(student);
         discountGroup.add(retiree);
         discountGroup.add(veteran);
         discountGroup.add(noDiscount);
-        student.setActionCommand("student");
-        retiree.setActionCommand("retiree");
-        veteran.setActionCommand("veteran");
-        noDiscount.setActionCommand("no discount");
-        this1.add(hour1, createGridBagConstraints(0, 1));
-        this1.add(hour2, createGridBagConstraints(1, 1));
-        this1.add(student, createGridBagConstraints(0, 2));
-        this1.add(retiree, createGridBagConstraints(1, 2));
-        this1.add(veteran, createGridBagConstraints(0, 3));
-        this1.add(noDiscount, createGridBagConstraints(1, 3));
-        this1.add(photoTaxLabel, createGridBagConstraints(0, 4));
-        this1.add(comboBoxPhoto, createGridBagConstraints(1, 4));
-        this1.add(videoTaxLabel, createGridBagConstraints(0, 5));
-        this1.add(comboBoxVideo, createGridBagConstraints(1, 5));
-        this.add(this1);
-        this.add(new JScrollPane(ticketTable));
+
+        data = getTableData();
+        ticketTableModel = new DefaultTableModel(data, columnNames);
+        ticketTable = new JTable(ticketTableModel);
+        ticketTable.getTableHeader().setReorderingAllowed(false);
+        orderTableModel = new DefaultTableModel(data2, columnNames2);
+        orderTable = new JTable(orderTableModel);
+
         addDataButton.addActionListener(this);
         deleteDataButton.addActionListener(this);
         addTicketsButton.addActionListener(this);
         deleteTicketsButton.addActionListener(this);
         placeOrderButton.addActionListener(this);
-        this.add(addDataButton);
-        this.add(deleteDataButton);
-        this.add(new JScrollPane(orderTable));
-        this.add(addTicketsButton);
-        this.add(deleteTicketsButton);
-        this.add(comboBoxPayment);
+
+        JPanel orderSpecifications = new JPanel();
+        orderSpecifications.setLayout(new GridBagLayout());
+        orderSpecifications.add(ticketCountLabel, createGridBagConstraints(0, 0));
+        orderSpecifications.add(ticketCountTextField, createGridBagConstraints(1, 0));
+        orderSpecifications.add(hour1, createGridBagConstraints(0, 1));
+        orderSpecifications.add(hour2, createGridBagConstraints(1, 1));
+        orderSpecifications.add(student, createGridBagConstraints(0, 2));
+        orderSpecifications.add(retiree, createGridBagConstraints(1, 2));
+        orderSpecifications.add(veteran, createGridBagConstraints(0, 3));
+        orderSpecifications.add(noDiscount, createGridBagConstraints(1, 3));
+        orderSpecifications.add(photoTaxLabel, createGridBagConstraints(0, 4));
+        orderSpecifications.add(comboBoxPhoto, createGridBagConstraints(1, 4));
+        orderSpecifications.add(videoTaxLabel, createGridBagConstraints(0, 5));
+        orderSpecifications.add(comboBoxVideo, createGridBagConstraints(1, 5));
+
+        JPanel ticketSelection = new JPanel();
+        JPanel ticketButtons = new JPanel();
+        ticketSelection.setBorder(BorderFactory.createTitledBorder("Ticket options"));
+        ticketSelection.setLayout(new BorderLayout());
+        ticketButtons.setLayout(new GridLayout(1, 2));
+        ticketSelection.add(new JScrollPane(ticketTable), BorderLayout.NORTH);
+        ticketButtons.add(addDataButton);
+        ticketButtons.add(deleteDataButton);
+        ticketSelection.add(ticketButtons, BorderLayout.SOUTH);
+
+        JPanel orderPlacement = new JPanel();
+        JPanel orderPlacementButtons = new JPanel();
+        orderPlacement.setBorder(BorderFactory.createTitledBorder("Cart"));
+        orderPlacement.setLayout(new BorderLayout());
+        orderPlacementButtons.setLayout(new GridLayout(1, 2));
+        orderPlacement.add(new JScrollPane(orderTable), BorderLayout.NORTH);
+        orderPlacementButtons.add(addTicketsButton);
+        orderPlacementButtons.add(deleteTicketsButton);
+        orderPlacement.add(orderPlacementButtons, BorderLayout.SOUTH);
+        
+        JPanel tables = new JPanel();
+        tables.setLayout(new GridLayout(1,2));
+        tables.add(ticketSelection);
+        tables.add(orderPlacement);
+        
+        this.add(orderSpecifications, BorderLayout.NORTH);
+        this.add(tables, BorderLayout.CENTER);
+        /*this.add(comboBoxPayment);
         this.add(cartTotalItems);
         this.add(placeOrderButton);
+        */
         ticketTable.removeColumn(ticketTable.getColumnModel().getColumn(0));
     }
 
@@ -104,22 +136,17 @@ public class SellTickets extends JPanel implements ActionListener {
             item.getTicketType(),
             item.getTicketDescription(),
             item.getTicketPrice()
-        })
-                .toArray(Object[][]::new);
+        }).toArray(Object[][]::new);
     }
 
     public Object[][] getTableData2() {
-        int size = orderStoring.size();
-        data = new Object[size][6];
-        for (int i = 0; i < size; i++) {
-            data[i][0] = orderStoring.get(i).getTimePeriod();
-            data[i][1] = orderStoring.get(i).getDiscountType();
-            data[i][2] = orderStoring.get(i).getTicketType();
-            data[i][3] = orderStoring.get(i).getPhotoTax();
-            data[i][4] = orderStoring.get(i).getVideoTax();
-            data[i][5] = orderStoring.get(i).getPrice();
-        }
-        return data;
+        return orderStoring.stream()
+                .map(item -> new Object[]{
+            item.getTimePeriod(),
+            item.getDiscountType(),
+            item.getPhotoTax(),
+            item.getVideoTax(),
+            item.getPrice(),}).toArray(Object[][]::new);
     }
 
     public void resetFrame() {
@@ -138,7 +165,7 @@ public class SellTickets extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addDataButton) {
             if (frame == null) {
-                frame = new DataAddingFrame2(db, this::getTableData, ticketTableModel, columnNames, ticketTable, this);
+                frame = new DataAddingFrame2(this::getTableData, ticketTableModel, columnNames, ticketTable, this);
             }
         } else if (e.getSource() == deleteDataButton) {
             int[] selection = ticketTable.getSelectedRows();
@@ -185,22 +212,24 @@ public class SellTickets extends JPanel implements ActionListener {
                         orderStoring.add(orderItem = new OrderItem(hourGroup.getSelection().getActionCommand(), discountGroup.getSelection().getActionCommand(), ticketType, String.valueOf(comboBoxPhoto.getSelectedItem()), String.valueOf(comboBoxVideo.getSelectedItem()), price));
                     }
                 }
-                if (initialOrderSize < 10  && orderItemCount >= 10) {
+                if (initialOrderSize < 10 && orderItemCount >= 10) {
                     int orderLength = orderStoring.size();
                     for (int i = 0; i < orderLength; i++) {
                         double price = orderStoring.get(i).getPrice();
                         orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
+                        totalCost = totalCost + orderStoring.get(i).getPrice();
                     }
-                } else if (initialOrderSize > 10) {
+                } else if (initialOrderSize >= 10) {
                     int orderLength = orderStoring.size();
                     for (int i = orderLength - 1; i >= initialOrderSize; i--) {
                         double price = orderStoring.get(i).getPrice();
                         orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
+                        totalCost = totalCost + orderStoring.get(i).getPrice();
                     }
                 }
                 data2 = getTableData2();
                 orderTableModel.setDataVector(data2, columnNames2);
-                if(orderStoring.size() >= 10) {
+                if (orderStoring.size() >= 10) {
                     cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
                 }
             }
@@ -215,25 +244,40 @@ public class SellTickets extends JPanel implements ActionListener {
                         orderTableModel.removeRow(modelIndex);
                         orderStoring.remove(viewIndex);
                     }
-                    orderItemCount = orderItemCount - selection.length;
-                    if (orderItemCount < 10) {
+                    orderItemCount = orderTableModel.getRowCount();
+                    if (orderItemCount < 10 && cartTotalItems.getText().contains("group sale applied")) {
                         cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
                         for (int i = 0; i < orderItemCount; i++) {
                             double price = orderStoring.get(i).getPrice();
                             orderStoring.get(i).setPrice(price / (0.9));
+                            totalCost = totalCost - orderStoring.get(i).getPrice();
                         }
-                        data2 = getTableData2();
-                        orderTableModel.setDataVector(data2, columnNames2);
+                    } else if (orderItemCount < 10 && !cartTotalItems.getText().contains("group sale applied")) {
+                        cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
+                        for (int i = 0; i < orderItemCount; i++) {
+                            totalCost = totalCost - orderStoring.get(i).getPrice();
+                        }
+                    } else if (orderItemCount >= 10) {
+                        cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
+                        for (int i = 0; i < orderItemCount; i++) {
+                            totalCost = totalCost - orderStoring.get(i).getPrice();
+                        }
                     }
+                    data2 = getTableData2();
+                    orderTableModel.setDataVector(data2, columnNames2);
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please select a row to delete.");
             }
         } else if (e.getSource() == placeOrderButton) {
-            if(orderItemCount > 0) {
+            if (orderItemCount > 0) {
                 int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to palce the order?", "Delete Confirmation", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    System.out.println("ma cac");
+                    String groupDiscountValidation = "No";
+                    if (orderItemCount >= 10) {
+                        groupDiscountValidation = "Yes";
+                    }
+                    db.insertData4(orderItemCount, totalCost, groupDiscountValidation, String.valueOf(comboBoxPayment.getSelectedItem()));
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please place items into the cart.");
