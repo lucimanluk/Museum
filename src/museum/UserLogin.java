@@ -26,24 +26,29 @@ public class UserLogin extends JFrame implements ActionListener {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        JPanel usernamePanel = new JPanel();
+        JPanel credentialsPanel = new JPanel();
+        credentialsPanel.setLayout(new BorderLayout());
+        
+        JPanel usernamePanel = new JPanel();      
         usernamePanel.add(usernameLabel);
         usernamePanel.add(usernameTextField);
-
+        
         JPanel passwordPanel = new JPanel();
         passwordPanel.add(passwordLabel);
         passwordPanel.add(passwordField);
 
+        credentialsPanel.add(usernamePanel, BorderLayout.NORTH);
+        credentialsPanel.add(passwordPanel, BorderLayout.CENTER);
+        
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.add(loginButton);
         buttonsPanel.add(exitButton);
 
-        mainPanel.add(usernamePanel, BorderLayout.NORTH);
-        mainPanel.add(passwordPanel, BorderLayout.CENTER);
+        mainPanel.add(credentialsPanel, BorderLayout.NORTH);
         mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
-
+        
         this.add(mainPanel);
-        this.setSize(400, 300);
+        this.setSize(400, 150);
         this.setVisible(true);
     }
 
