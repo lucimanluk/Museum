@@ -13,9 +13,14 @@ public class SoldTickets extends JPanel {
     private final String[] columnNames = {"ID", "Tickets sold", "Total price", "Group discount", "Payment type"};
     private final String[] columnNames2 = {"ID", "Order ID", "Hours", "Discount type", "Ticket type", "Photo tax", "Video tax", "Price", "Payment type"};
 
+    private int nrTicketsSold = 0;
+    private double totalIncome = 0;
+    
     private Object[][] data;
     private Object[][] data2;
 
+    private JLabel nrTicketsSoldLabel = new JLabel("Number of tickets sold: " + nrTicketsSold);
+    private JLabel totalIncomeLabel = new JLabel("Income from sold tickets: " + totalIncome);
     private JTable ordersTable;
     private DefaultTableModel model;
     private JTable ticketsSoldTable;
@@ -40,7 +45,12 @@ public class SoldTickets extends JPanel {
         tablePanel.add(new JScrollPane(ordersTable));
         tablePanel.add(new JScrollPane(ticketsSoldTable));
 
-        add(tablePanel, BorderLayout.CENTER);
+        JPanel statisticsPanel = new JPanel(new GridLayout(2,1,10,10));
+        statisticsPanel.add(nrTicketsSoldLabel);
+        statisticsPanel.add(totalIncomeLabel);
+        
+        this.add(tablePanel, BorderLayout.CENTER);
+        this.add(statisticsPanel, BorderLayout.SOUTH);
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -52,6 +62,11 @@ public class SoldTickets extends JPanel {
                 data2 = getTableData2();
                 model2.setDataVector(data2, columnNames2);
                 ticketsSoldTable.removeColumn(ticketsSoldTable.getColumnModel().getColumn(0));
+                nrTicketsSold = 0;
+                totalIncome = 0;
+                getIncomeAndSoldTickets();
+                nrTicketsSoldLabel.setText("Number of tickets sold: " + nrTicketsSold);
+                totalIncomeLabel.setText("Income from sold tickets: " + totalIncome);
             }
         });
     }
@@ -80,6 +95,13 @@ public class SoldTickets extends JPanel {
         }).toArray(Object[][]::new);
     }
 
+    public void getIncomeAndSoldTickets() {
+        for(int i = 0; i < orderStoring.size(); i++) {
+            nrTicketsSold = nrTicketsSold + orderStoring.get(i).getTicketsSold();
+            totalIncome = totalIncome + orderStoring.get(i).getTotalPrice();
+        }
+    }
+    
     public void getOrderData() {
         orderStoring.clear();
         try {
@@ -97,6 +119,7 @@ public class SoldTickets extends JPanel {
     public void getSoldTicketsData() {
         soldTicketsStoring.clear();
         try {
+            int i = 0;
             String query = "SELECT * FROM `ticket sales`";
             ResultSet result = db.getStatement().executeQuery(query);
             while (result.next()) {

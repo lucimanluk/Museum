@@ -1,6 +1,8 @@
 package museum;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.*;
 
 public class MainFrame extends JFrame {
@@ -10,9 +12,10 @@ public class MainFrame extends JFrame {
     private SellTickets se1lTicketsPane;
     private ManageInventory manageInventoryPane;
     private SoldTickets SoldTicketsPane;
+    private FrameSelector parentPanel;
 
-    public MainFrame(int admin) {
-
+    public MainFrame(int admin, FrameSelector parentPanel) {
+        this.parentPanel = parentPanel;
         se1lTicketsPane = new SellTickets();
         manageInventoryPane = new ManageInventory(admin);
         SoldTicketsPane = new SoldTickets();
@@ -21,6 +24,13 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Ticket sales", SoldTicketsPane);
 
         this.add(tabbedPane);
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                parentPanel.resetFrame();
+            }
+        });
         
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setSize(800, 600);

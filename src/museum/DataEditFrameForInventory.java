@@ -51,6 +51,13 @@ public class DataEditFrameForInventory extends JFrame implements ActionListener 
         add(roomLabel);
         add(roomField);
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                parentPanel.resetFrameEdit();
+            }
+        });
+        
         editData.addActionListener(this);
         closeFrame.addActionListener(this);
         add(editData);
@@ -90,8 +97,10 @@ public class DataEditFrameForInventory extends JFrame implements ActionListener 
             updateExhibitionItemsTable(id, name, description, region, year, room);
             parentPanel.RefreshTableData();
             dispose();
+            parentPanel.resetFrameEdit();
         } else if (e.getSource() == closeFrame) {
             dispose();
+            parentPanel.resetFrameEdit();
         }
     }
 }

@@ -5,7 +5,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.table.DefaultTableModel;
 
-public class DataAddingFrameForTickets extends JFrame implements ActionListener {
+public class DataAddingFrameForTickets extends JFrame implements ActionListener, KeyListener {
 
     private JLabel typeLabel = new JLabel("Ticket type");
     private JTextField typeField = new JTextField(20);
@@ -39,6 +39,7 @@ public class DataAddingFrameForTickets extends JFrame implements ActionListener 
 
         addDataButton2.addActionListener(this);
         closeFrame.addActionListener(this);
+        priceField.addKeyListener(this);
 
         add(addDataButton2);
         add(closeFrame);
@@ -55,10 +56,34 @@ public class DataAddingFrameForTickets extends JFrame implements ActionListener 
                     && !priceField.getText().isEmpty()) {
                 parentPanel.insertInTicketTable(typeField.getText(), descriptionField.getText(), Integer.parseInt(priceField.getText()));
                 parentPanel.refreshTableData();
+                dispose();
+                parentPanel.resetFrame();
+            } else {
+                JOptionPane.showMessageDialog(null, "Please fill all the fields");
             }
         } else if (e.getSource() == closeFrame) {
             dispose();
             parentPanel.resetFrame();
         }
+    }
+    
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (e.getSource() == priceField) {
+            char c = e.getKeyChar();
+            if(!Character.isDigit(c)) {
+                e.consume();
+            }
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 }

@@ -39,8 +39,16 @@ public class DataAddingFrameForInventory extends JFrame implements ActionListene
         add(roomLabel);
         add(roomField);
 
+         addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                parentPanel.resetFrameAdding();
+            }
+        });
+        
         addDataButton2.addActionListener(this);
         closeFrame.addActionListener(this);
+        
         add(addDataButton2);
         add(closeFrame);
 
@@ -59,9 +67,11 @@ public class DataAddingFrameForInventory extends JFrame implements ActionListene
                 parentPanel.insertIntoExhibitionTable(nameField.getText(), descriptionField.getText(), regionField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(roomField.getText()));
                 parentPanel.RefreshTableData();
                 dispose();
+                parentPanel.resetFrameAdding();
             }
         } else if (e.getSource() == closeFrame) {
             dispose();
+            parentPanel.resetFrameAdding();
         }
     }
 }

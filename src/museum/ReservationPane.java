@@ -38,14 +38,24 @@ public class ReservationPane extends JFrame implements KeyListener, ActionListen
     private Reservation reservation;
     private ArrayList<Reservation> reservationStoring = new ArrayList<Reservation>();
     private Database db = Database.getInstance();
+    private FrameSelector parentPanel;
+    
+    public ReservationPane(FrameSelector parentPanel) {
 
-    public ReservationPane() {
-
+        this.parentPanel = parentPanel;
+        
         this.setLayout(new GridLayout(2, 1));
 
         dateTimeTextField = new JTextField(formattedDate);
         ticketAmountBox.setPreferredSize(new Dimension(50, 25));
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                parentPanel.resetReservation();
+            }
+        });
+        
         phoneNumberTextField.addKeyListener(this);
         addReservationButton.addActionListener(this);
 

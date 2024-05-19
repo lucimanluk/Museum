@@ -23,33 +23,48 @@ public class ManageInventory extends JPanel implements ActionListener {
     private JButton deleteDataButton = new JButton("Delete data");
     private JButton editItemButton = new JButton("Edit item");
 
+    private DataAddingFrameForInventory frame;
+    private DataEditFrameForInventory frame2;
     private Item item;
     public ArrayList<Item> itemStoring = new ArrayList<Item>();
     private Database db = Database.getInstance();
 
     public ManageInventory(int admin) {
 
-        this.setLayout(new FlowLayout());
+        this.setLayout(new BorderLayout());
+        this.setBorder(BorderFactory.createTitledBorder("Item management"));
 
         getExhibitionItemsData();
         data = getTableData();
         model = new DefaultTableModel(data, columnNames);
         tabelManagementInventory = new JTable(model);
         tabelManagementInventory.getTableHeader().setReorderingAllowed(false);
-        this.add(new JScrollPane(tabelManagementInventory));
+        this.add(new JScrollPane(tabelManagementInventory), BorderLayout.CENTER);
 
         if (admin == 1) {
             addDataButton.addActionListener(this);
             deleteDataButton.addActionListener(this);
             editItemButton.addActionListener(this);
 
-            this.add(addDataButton);
-            this.add(deleteDataButton);
-            this.add(editItemButton);
-        }else {
+            JPanel buttons = new JPanel();
+            buttons.setLayout(new GridLayout(1, 3));
+            
+            buttons.add(addDataButton);
+            buttons.add(deleteDataButton);
+            buttons.add(editItemButton);
+            this.add(buttons, BorderLayout.SOUTH);
+        } else {
             tabelManagementInventory.setDefaultEditor(Object.class, null);
         }
         tabelManagementInventory.removeColumn(tabelManagementInventory.getColumnModel().getColumn(0));
+    }
+
+    public void resetFrameAdding() {
+        this.frame = null;
+    }
+
+    public void resetFrameEdit() {
+        this.frame2 = null;
     }
 
     public Object[][] getTableData() {
@@ -110,7 +125,9 @@ public class ManageInventory extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == addDataButton) {
-            new DataAddingFrameForInventory(this);
+            if (frame == null) {
+                frame = new DataAddingFrameForInventory(this);
+            }
         } else if (e.getSource() == deleteDataButton) {
             int[] selection = tabelManagementInventory.getSelectedRows();
             if (selection.length > 0) {
@@ -134,9 +151,11 @@ public class ManageInventory extends JPanel implements ActionListener {
             } else if (tabelManagementInventory.getSelectedRowCount() > 1) {
                 JOptionPane.showMessageDialog(null, "You have selected too many items to edit.");
             } else {
-                JTable table = this.tabelManagementInventory;
-                DefaultTableModel model = this.model;
-                new DataEditFrameForInventory(this, table, model);
+                if (frame2 == null) {
+                    JTable table = this.tabelManagementInventory;
+                    DefaultTableModel model = this.model;
+                    frame2 = new DataEditFrameForInventory(this, table, model);;
+                }
             }
         }
     }

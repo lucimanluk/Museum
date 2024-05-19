@@ -10,10 +10,13 @@ public class FrameSelector extends JFrame {
     private JButton mainFrameButton = new JButton("Main frame");
     private JButton reservationPaneButton = new JButton("Reservation");
 
+    private MainFrame mainFrame;
+    private ReservationPane reservationPane;
+
     public FrameSelector(String title, int admin) {
-        
+
         super(title);
-        
+
         this.setLayout(new GridLayout(2, 1));
 
         mainFrameButton.addActionListener(new ActionListener() {
@@ -25,7 +28,9 @@ public class FrameSelector extends JFrame {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                new MainFrame(admin); 
+                                if (mainFrame == null) {
+                                    mainFrame = new MainFrame(admin, FrameSelector.this);
+                                }
                             }
                         });
                     }
@@ -33,17 +38,19 @@ public class FrameSelector extends JFrame {
                 t.start();
             }
         });
-        
+
         reservationPaneButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {         
+            public void actionPerformed(ActionEvent e) {
                 Thread t = new Thread(new Runnable() {
                     @Override
-                    public void run() {             
+                    public void run() {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                new ReservationPane();  
+                                if (reservationPane == null) {
+                                    reservationPane = new ReservationPane(FrameSelector.this);
+                                }
                             }
                         });
                     }
@@ -56,7 +63,15 @@ public class FrameSelector extends JFrame {
         this.add(reservationPaneButton);
 
         this.setVisible(true);
-        this.setSize(400, 300);
+        this.setSize(600,300);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    public void resetFrame() {
+        this.mainFrame = null;
+    }
+
+    public void resetReservation() {
+        this.reservationPane = null;
     }
 }
