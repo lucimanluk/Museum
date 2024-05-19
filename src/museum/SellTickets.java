@@ -19,6 +19,7 @@ public class SellTickets extends JPanel implements ActionListener {
     private Object[][] data2;
     private int orderItemCount = 0;
     private double totalCost = 0;
+    private int orderIdFetcher = 0;
 
     private JLabel ticketCountLabel = new JLabel("Enter number of tickets");
     private JTextField ticketCountTextField = new JTextField(20);
@@ -192,8 +193,8 @@ public class SellTickets extends JPanel implements ActionListener {
         try {
             db.getStatement().executeUpdate(query);
             System.out.println("Data inserted successfully");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage() + " - Error inserting data");
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage() + " - Error inserting data");
         }
     }
 
@@ -203,8 +204,34 @@ public class SellTickets extends JPanel implements ActionListener {
         try {
             db.getStatement().executeUpdate(query);
             System.out.println("Data inserted successfully");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage() + " - Error inserting data");
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage() + " - Error inserting data");
+        }
+    }
+
+    public void getOrderId() {
+        String query = "SELECT MAX(`ID`) FROM `orders`";
+        try {
+            ResultSet result = db.getStatement().executeQuery(query);
+            while (result.next()) {
+                orderIdFetcher = result.getInt(1);
+                System.out.println(orderIdFetcher);
+            }
+            System.out.println("Data extracted successfully");
+        } catch (SQLException ex) {
+            System.out.println("Problem to extract data");
+            System.out.println(orderIdFetcher);
+            ex.printStackTrace();
+        }
+    }
+
+    public void insertInTicketSalesTable(int orderIdFetcher, String hour, String discountType, String ticketType,String photoTax, String videoTax, double price, String paymentType) {
+        String query = "INSERT INTO `ticket sales` (`Order ID`, `Hour`, `Discount type`, `Ticket type`, `Photo tax`, `Video tax`, `Price`, `Payment type`) VALUES ('"
+                + orderIdFetcher + "', '" + hour + "', '" + discountType + "', '" + ticketType + "', '" + photoTax + "', '" + videoTax + "', '" + price + "', '" + paymentType + "')";
+        try {
+            db.getStatement().executeUpdate(query);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage() + " - Error inserting data");
         }
     }
 
@@ -292,7 +319,7 @@ public class SellTickets extends JPanel implements ActionListener {
                         orderStoring.add(orderItem = new OrderItem(hourGroup.getSelection().getActionCommand(), discountGroup.getSelection().getActionCommand(), ticketType, String.valueOf(comboBoxPhoto.getSelectedItem()), String.valueOf(comboBoxVideo.getSelectedItem()), price));
                     }
                 }
-                
+
                 if (initialOrderSize < 10 && orderItemCount >= 10) {
                     int orderLength = orderStoring.size();
                     for (int i = 0; i < orderLength; i++) {
@@ -300,7 +327,7 @@ public class SellTickets extends JPanel implements ActionListener {
                         orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
                     }
                 } else if (orderStoring.size() >= 10) {
-                    for (int i =  orderStoring.size() - itemsToAdd; i < orderStoring.size(); i++) {
+                    for (int i = orderStoring.size() - itemsToAdd; i < orderStoring.size(); i++) {
                         double price = orderStoring.get(i).getPrice();
                         orderStoring.get(i).setPrice(price - (1.0 / 10.0) * price);
                     }
@@ -311,8 +338,8 @@ public class SellTickets extends JPanel implements ActionListener {
                 for (int i = 0; i < orderItemCount; i++) {
                     totalCost = totalCost + orderStoring.get(i).getPrice();
                 }
-                if(orderItemCount >= 10) {
-                    cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");                  
+                if (orderItemCount >= 10) {
+                    cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
                 } else {
                     cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
                 }
@@ -330,7 +357,7 @@ public class SellTickets extends JPanel implements ActionListener {
                         orderStoring.remove(viewIndex);
                     }
                     orderItemCount = orderTableModel.getRowCount();
-                    if (orderItemCount < 10 && cartTotalItems.getText().contains("group sale applied")) {                       
+                    if (orderItemCount < 10 && cartTotalItems.getText().contains("group sale applied")) {
                         for (int i = 0; i < orderItemCount; i++) {
                             double price = orderStoring.get(i).getPrice();
                             orderStoring.get(i).setPrice(price / (0.9));
@@ -344,8 +371,7 @@ public class SellTickets extends JPanel implements ActionListener {
                     }
                     if (orderItemCount >= 10) {
                         cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale applied)");
-                    }
-                    else {
+                    } else {
                         cartTotalItems.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
                     }
                     totalCostLabel.setText("Price: " + totalCost);
@@ -362,6 +388,10 @@ public class SellTickets extends JPanel implements ActionListener {
                         groupDiscountValidation = "Yes";
                     }
                     insertInOrdersTable(orderItemCount, totalCost, groupDiscountValidation, String.valueOf(comboBoxPayment.getSelectedItem()));
+                    getOrderId();
+                    for (int i = 0; i < orderItemCount; i++) {
+                        insertInTicketSalesTable(orderIdFetcher, orderStoring.get(i).getTimePeriod(), orderStoring.get(i).getDiscountType(), orderStoring.get(i).getTicketType(), orderStoring.get(i).getPhotoTax(), orderStoring.get(i).getVideoTax(), orderStoring.get(i).getPrice(), String.valueOf(comboBoxPayment.getSelectedItem()));
+                    }
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please place items into the cart.");

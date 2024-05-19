@@ -10,7 +10,7 @@ import java.time.format.*;
 import java.util.*;
 import javax.swing.table.DefaultTableModel;
 
-public class ReservationPane extends JPanel implements KeyListener, ActionListener {
+public class ReservationPane extends JFrame implements KeyListener, ActionListener {
 
     private static final String[] columnNames = {"Id", "Name", "Phone number", "Number of tickets", "Date and time"};
     
@@ -73,6 +73,11 @@ public class ReservationPane extends JPanel implements KeyListener, ActionListen
         this.add(new JScrollPane(reservationTable));
 
         reservationTable.removeColumn(reservationTable.getColumnModel().getColumn(0));
+        
+        this.setSize(800,400);
+        this.setVisible(true);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
     }
 
     public GridBagConstraints createGridBagConstraints(int x, int y) {

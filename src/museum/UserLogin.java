@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package museum;
 
 import javax.swing.*;
@@ -67,7 +63,7 @@ public class UserLogin extends JFrame implements ActionListener {
             ResultSet result = db.getStatement().executeQuery(query);
             if (result.next()) {
                 int adminVerification = result.getInt("Id");
-                new MainFrame(adminVerification);
+                new FrameSelector("Panel selector", adminVerification);
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid username or password");

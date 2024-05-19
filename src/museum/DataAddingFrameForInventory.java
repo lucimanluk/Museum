@@ -58,6 +58,7 @@ public class DataAddingFrameForInventory extends JFrame implements ActionListene
                     && !roomField.getText().isEmpty()) {
                 parentPanel.insertIntoExhibitionTable(nameField.getText(), descriptionField.getText(), regionField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(roomField.getText()));
                 parentPanel.RefreshTableData();
+                dispose();
             }
         } else if (e.getSource() == closeFrame) {
             dispose();
