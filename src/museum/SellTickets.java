@@ -4,9 +4,14 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.awt.print.PrinterException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.OrientationRequested;
 
 public class SellTickets extends JPanel implements ActionListener, KeyListener {
 
@@ -14,9 +19,11 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
     private static final String[] columnNames2 = {"Time period", "Discount type", "Ticket type", "Photo tax", "Video tax", "Price"};
     private static final String[] options = {"No", "Yes"};
     private static final String[] paymentOptions = {"Cash", "Card"};
+    private static final String[] totalColumns = {"Total cost", "Items in cart"};
 
     private Object[][] data;
-    private Object[][] data2;
+    private Object[][] data2; 
+
     private int orderItemCount = 0;
     private double totalCost = 0;
     private int orderIdFetcher = 0;
@@ -47,6 +54,7 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
     private JButton addTicketsButton = new JButton("Add to order");
     private JButton deleteTicketsButton = new JButton("Delete items");
     private JButton placeOrderButton = new JButton("Place order");
+    private JButton printOrderButton = new JButton("Print order");
     private DataAddingFrameForTickets frame;
 
     private Ticket ticket;
@@ -76,8 +84,6 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
         discountGroup.add(veteran);
         noDiscount.setSelected(true);
 
-        
-
         getTicketTypeData();
         data = getTableData();
         ticketTableModel = new DefaultTableModel(data, columnNames);
@@ -93,6 +99,7 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
         addTicketsButton.addActionListener(this);
         deleteTicketsButton.addActionListener(this);
         placeOrderButton.addActionListener(this);
+        printOrderButton.addActionListener(this);
 
         JPanel orderSpecifications = new JPanel();
         orderSpecifications.setLayout(new GridBagLayout());
@@ -132,12 +139,13 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
         cartManipulationButtons.add(deleteTicketsButton);
 
         JPanel orderPlacementButtons = new JPanel();
-        orderPlacementButtons.setLayout(new GridLayout(5, 1));
+        orderPlacementButtons.setLayout(new GridLayout(6, 1));
         orderPlacementButtons.add(cartManipulationButtons);
         orderPlacementButtons.add(cartTotalItemsLabel);
         orderPlacementButtons.add(totalCostLabel);
         orderPlacementButtons.add(comboBoxPayment);
         orderPlacementButtons.add(placeOrderButton);
+        orderPlacementButtons.add(printOrderButton);
 
         orderPlacement.add(orderPlacementButtons, BorderLayout.SOUTH);
 
@@ -151,8 +159,8 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
 
         ticketTable.removeColumn(ticketTable.getColumnModel().getColumn(0));
     }
-    
-     public void resetFrame() {
+
+    public void resetFrame() {
         this.frame = null;
     }
 
@@ -290,7 +298,7 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
         } else if (e.getSource() == addTicketsButton) {
             int[] selection = ticketTable.getSelectedRows();
             int ticketsNumber = Integer.parseInt(ticketCountTextField.getText());
-            if (selection.length > 0 && ticketsNumber!=0) {
+            if (selection.length > 0 && ticketsNumber != 0) {
                 int initialOrderSize = orderStoring.size();
                 int itemsToAdd = selection.length * ticketsNumber;
                 orderItemCount = orderItemCount + itemsToAdd;
@@ -341,9 +349,9 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
                     cartTotalItemsLabel.setText("Number of tickets: " + orderItemCount + " (group sale not applied)");
                 }
                 totalCostLabel.setText("Price: " + totalCost);
-            } else if (selection.length > 0 && ticketsNumber!=0){
+            } else if (selection.length > 0 && ticketsNumber != 0) {
                 JOptionPane.showMessageDialog(null, "Please select a ticket type.");
-            } 
+            }
         } else if (e.getSource() == deleteTicketsButton) {
             int[] selection = orderTable.getSelectedRows();
             if (selection.length > 0) {
@@ -408,10 +416,22 @@ public class SellTickets extends JPanel implements ActionListener, KeyListener {
             } else {
                 JOptionPane.showMessageDialog(null, "Please place items into the cart.");
             }
+        } else if (e.getSource() == printOrderButton) {
+            if (orderTable.getRowCount() > 0) {
+                MessageFormat header = new MessageFormat("Form title");
+                MessageFormat footer = new MessageFormat("Footer");
+                try {
+                    PrintRequestAttributeSet set = new HashPrintRequestAttributeSet();
+                    set.add(OrientationRequested.PORTRAIT);
+                    orderTable.print(JTable.PrintMode.FIT_WIDTH, header, footer, true, set, true);
+                } catch (PrinterException ex) {
+                    JOptionPane.showMessageDialog(null, "Failed" + ex);
+                }
+            }
         }
     }
-    
-     @Override
+
+    @Override
     public void keyTyped(KeyEvent e) {
         if (e.getSource() == ticketCountTextField) {
             char c = e.getKeyChar();
